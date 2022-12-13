@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace NvidiaMaxine.VideoEffects.Image
+namespace NvidiaMaxine.VideoEffects
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct NVCVImage
+    public struct NvCVImageS
     {
         /// <summary>
         /// The number of pixels horizontally in the image.
@@ -23,12 +23,12 @@ namespace NvidiaMaxine.VideoEffects.Image
         /// <summary>
         /// The format of the pixels in the image.
         /// </summary>
-        public PixelFormat PixelFormat;
+        public NvCVImagePixelFormat PixelFormat;
 
         /// <summary>
         /// The data type used to represent each component of the image.
         /// </summary>
-        public ComponentType ComponentType;
+        public NvCVImageComponentType ComponentType;
 
         /// <summary>
         ///  The number of bytes in a chunky pixel.
@@ -88,6 +88,6 @@ namespace NvidiaMaxine.VideoEffects.Image
         /// <summary>
         /// The maximum amount of memory available through pixels.
         /// </summary>
-        public ulong BufferBytes;            
+        public ulong BufferBytes;
     };
 }

@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.VideoEffects.Image
+namespace NvidiaMaxine.VideoEffects
 {
 
     /// <summary>
     /// The format of pixels in an image.
     /// </summary>
-    public enum PixelFormat
+    public enum NvCVImagePixelFormat
     {
         /// <summary>
         /// Unknown pixel format.

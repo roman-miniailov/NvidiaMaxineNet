@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.VideoEffects.Image
+namespace NvidiaMaxine.VideoEffects
 {
     /// <summary>
-    /// FourCC.
+    /// FourCC/layout.
     /// </summary>
-    public enum FourCC
+    public enum NvCVLayout
     {
         /// <summary>
         /// All components of pixel(x,y) are adjacent (same as chunky) (default for non-YUV).
@@ -89,23 +89,23 @@ namespace NvidiaMaxine.VideoEffects.Image
         /// <summary>
         /// [Y][V][U] Planar 4:2:0.
         /// </summary>
-        NVCV_YV12 = NVCV_YVU,  
+        NVCV_YV12 = NVCV_YVU,
 
         /// <summary>
         /// [Y][UV] Semi-planar 4:2:0 (default for 4:2:0).
         /// </summary>
-        NVCV_NV12 = NVCV_YCUV, 
+        NVCV_NV12 = NVCV_YCUV,
 
         /// <summary>
         /// [Y][VU] Semi-planar 4:2:0.
         /// </summary>
-        NVCV_NV21 = NVCV_YCVU, 
+        NVCV_NV21 = NVCV_YCVU,
 
         /// <summary>
         /// [YUYV] Chunky 4:2:2.
         /// </summary>
-        NVCV_YUY2 = NVCV_YUYV, 
-                               
+        NVCV_YUY2 = NVCV_YUYV,
+
         /// <summary>
         /// [Y][U][V] Planar 4:4:4.
         /// </summary>
@@ -129,6 +129,6 @@ namespace NvidiaMaxine.VideoEffects.Image
         /// <summary>
         /// [Y][VU] Semi-planar 4:4:4.
         /// </summary>
-        NVCV_NV42 = NVCV_YCVU, 
+        NVCV_NV42 = NVCV_YCVU,
     }
 }

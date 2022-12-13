@@ -1,9 +1,9 @@
-﻿namespace NvidiaMaxine.VideoEffects.Image
+﻿namespace NvidiaMaxine.VideoEffects
 {
     /// <summary>
     /// The data type used to represent each component of an image.
     /// </summary>
-    public enum ComponentType
+    public enum NvCVImageComponentType
     {
         /// <summary>
         /// Unknown type of component.
@@ -13,51 +13,51 @@
         /// <summary>
         /// Unsigned 8-bit integer.
         /// </summary>
-        NVCV_U8 = 1,      
+        NVCV_U8 = 1,
 
         /// <summary>
         /// Unsigned 16-bit integer.
         /// </summary>
-        NVCV_U16 = 2,       
+        NVCV_U16 = 2,
 
         /// <summary>
         /// Signed 16-bit integer.
         /// </summary>
-        NVCV_S16 = 3,       
+        NVCV_S16 = 3,
 
         /// <summary>
         /// 16-bit floating-point.
         /// </summary>
-        NVCV_F16 = 4,       
+        NVCV_F16 = 4,
 
         /// <summary>
         /// Unsigned 32-bit integer.
         /// </summary>
-        NVCV_U32 = 5,       
+        NVCV_U32 = 5,
 
         /// <summary>
         /// Signed 32-bit integer.
         /// </summary>
-        NVCV_S32 = 6,       
+        NVCV_S32 = 6,
 
         /// <summary>
         /// 32-bit floating-point (float).
         /// </summary>
-        NVCV_F32 = 7,       
+        NVCV_F32 = 7,
 
         /// <summary>
         /// Unsigned 64-bit integer.
         /// </summary>
-        NVCV_U64 = 8,       
+        NVCV_U64 = 8,
 
         /// <summary>
         /// Signed 64-bit integer.
         /// </summary>
-        NVCV_S64 = 9,       
+        NVCV_S64 = 9,
 
         /// <summary>
         /// 64-bit floating-point (double).
         /// </summary>
-        NVCV_F64 = 10,      
+        NVCV_F64 = 10,
     }
 }

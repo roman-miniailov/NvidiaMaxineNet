@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.VideoEffects.Image
+namespace NvidiaMaxine.VideoEffects
 {
-    internal class NVCVImageAPI
+    public class CUstream_st
     {
     }
 }
