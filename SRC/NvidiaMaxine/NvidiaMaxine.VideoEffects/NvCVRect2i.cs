@@ -32,5 +32,31 @@ namespace NvidiaMaxine.VideoEffects
         /// The height of the rectangle.
         /// </summary>
         public int Height;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NvCVRect2i"/> struct.
+        /// </summary>
+        public NvCVRect2i()
+        {
+            X = 0;
+            Y = 0;
+            Width = 0;
+            Height = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NvCVRect2i"/> struct.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        public NvCVRect2i(int x, int y, int width, int height)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
     }
 }

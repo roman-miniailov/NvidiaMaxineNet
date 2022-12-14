@@ -35,7 +35,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <returns>NvCVStatus. NVCV_SUCCESS if successful. NVCV_ERR_PIXELFORMAT if the pixel format is not yet accommodated.</returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Init(
-            NvCVImageS im, 
+            NvCVImage im, 
             uint width, 
             uint height, 
             int pitch, 
@@ -63,8 +63,8 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern void NvCVImage_InitView(
-            NvCVImageS subImg, 
-            NvCVImageS fullImg, 
+            NvCVImage subImg, 
+            NvCVImage fullImg, 
             int x, 
             int y,
             uint width, 
@@ -94,7 +94,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Alloc(
-            NvCVImageS im, 
+            NvCVImage im, 
             uint width, 
             uint height, 
             NvCVImagePixelFormat format,
@@ -129,7 +129,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Realloc(
-            NvCVImageS im, 
+            NvCVImage im, 
             uint width, 
             uint height, 
             NvCVImagePixelFormat format,
@@ -143,7 +143,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </summary>
         /// <param name="im">The image whose buffer is to be deallocated..</param>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NvCVImage_Dealloc(NvCVImageS im);
+        public static extern void NvCVImage_Dealloc(NvCVImage im);
 
         /// <summary>
         /// Deallocate the image buffer from the image asynchronously on the specified stream. The image is not deallocated.
@@ -151,7 +151,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="im">The image whose buffer is to be deallocated.</param>
         /// <param name="stream">The CUDA stream on which the image buffer is to be deallocated.</param>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NvCVImage_DeallocAsync(NvCVImageS im, CUstream_st stream);
+        public static extern void NvCVImage_DeallocAsync(NvCVImage im, CUstream_st stream);
 
         /// <summary>
         /// Allocate a new image, with storage (C-style constructor).
@@ -184,14 +184,14 @@ namespace NvidiaMaxine.VideoEffects
             NvCVLayout layout, 
             NvCVMemSpace memSpace, 
             uint alignment,
-            out NvCVImageS image);
+            out NvCVImage image);
 
         /// <summary>
         /// Deallocate the image allocated with NvCVImage_Create() (C-style destructor).
         /// </summary>
         /// <param name="im">The image.</param>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NvCVImage_Destroy(NvCVImageS im);
+        public static extern void NvCVImage_Destroy(NvCVImage im);
 
         /// <summary>
         /// Get offsets for the components of a pixel format. These are not byte offsets, but component offsets.
@@ -295,11 +295,11 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Transfer(
-             NvCVImageS src, 
-             NvCVImageS dst, 
+             NvCVImage src, 
+             NvCVImage dst, 
              float scale, 
              CUstream_st stream, 
-             ref NvCVImageS tmp);
+             ref NvCVImage tmp);
 
         /// <summary>
         /// Transfer a rectangular portion of an image. See NvCVImage_Transfer() for the pixel format combinations that are implemented.
@@ -318,13 +318,13 @@ namespace NvidiaMaxine.VideoEffects
         /// <remarks>The actual transfer region may be smaller, because the rects are clipped against the images.</remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_TransferRect(
-            NvCVImageS src,
+            NvCVImage src,
             NvCVRect2i srcRect,
-            out NvCVImageS dst,
+            NvCVImage dst,
             NvCVPoint2i dstPt,
             float scale, 
             CUstream_st stream,
-            NvCVImageS tmp);
+            NvCVImage tmp);
 
         /// <summary>
         /// Transfer from a YUV image. YUVu8 --> RGBu8 and YUVu8 --> RGBf32 are currently available.
@@ -364,11 +364,11 @@ namespace NvidiaMaxine.VideoEffects
             NvCVImageComponentType yuvType,
             uint yuvColorSpace, 
             NvCVMemSpace yuvMemSpace,
-            out NvCVImageS dst, 
+            out NvCVImage dst, 
             NvCVRect2i dstRect, 
             float scale, 
             CUstream_st stream, 
-            NvCVImageS tmp);
+            NvCVImage tmp);
 
         /// <summary>
         /// Transfer to a YUV image. RGBu8 --> YUVu8 and RGBf32 --> YUVu8 are currently available.
@@ -397,7 +397,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_TransferToYUV(
-            NvCVImageS src, 
+            NvCVImage src, 
             NvCVRect2i srcRect,
             IntPtr y,
             int yPixBytes,
@@ -412,7 +412,7 @@ namespace NvidiaMaxine.VideoEffects
             NvCVMemSpace yuvMemSpace,
             float scale, 
             CUstream_st stream, 
-            NvCVImageS tmp);
+            NvCVImage tmp);
 
         /// <summary>
         /// Between rendering by a graphics system and Transfer by CUDA, it is necessary to map the texture resource.
@@ -423,7 +423,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="stream">The stream on which the mapping is to be performed.</param>
         /// <returns>NvCVStatus. NVCV_SUCCESS is the operation was completed successfully.</returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvCVImage_MapResource(NvCVImageS im, CUstream_st stream);
+        public static extern NvCVStatus NvCVImage_MapResource(NvCVImage im, CUstream_st stream);
 
         /// <summary>
         /// After transfer by CUDA, the texture resource must be unmapped in order to be used by the graphics system again.
@@ -434,7 +434,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="stream">The CUDA stream on which the mapping is to be performed.</param>
         /// <returns>NvCVStatus. NVCV_SUCCESS is the operation was completed successfully.</returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvCVImage_UnmapResource(NvCVImageS im, CUstream_st stream);
+        public static extern NvCVStatus NvCVImage_UnmapResource(NvCVImage im, CUstream_st stream);
 
 
         /// <summary>
@@ -457,10 +457,10 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Composite(
-            NvCVImageS fg, 
-            NvCVImageS bg,
-            NvCVImageS mat,
-            out NvCVImageS dst,
+            NvCVImage fg, 
+            NvCVImage bg,
+            NvCVImage mat,
+            out NvCVImage dst,
             CUstream_st stream);
 
         /// <summary>
@@ -494,13 +494,13 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_CompositeRect(
-            NvCVImageS fg,
+            NvCVImage fg,
             NvCVPoint2i fgOrg,
-            NvCVImageS bg,
+            NvCVImage bg,
             NvCVPoint2i bgOrg,
-            NvCVImageS mat, 
+            NvCVImage mat, 
             uint mode,
-            out NvCVImageS dst,
+            out NvCVImage dst,
             NvCVPoint2i dstOrg,
             CUstream_st stream);
 
@@ -529,10 +529,10 @@ namespace NvidiaMaxine.VideoEffects
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_CompositeOverConstant(
-            NvCVImageS src, 
-            NvCVImageS mat,
+            NvCVImage src, 
+            NvCVImage mat,
             IntPtr bgColor, 
-            ref NvCVImageS dst, 
+            ref NvCVImage dst, 
             CUstream_st stream);
 
         /// <summary>
@@ -552,7 +552,7 @@ namespace NvidiaMaxine.VideoEffects
         /// This does work for all chunky formats, including UYVY, VYUY, YUYV, YVYU.
         /// </remarks>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvCVImage_FlipY(NvCVImageS src, NvCVImageS dst);
+        public static extern NvCVStatus NvCVImage_FlipY(NvCVImage src, NvCVImage dst);
 
         /// <summary>
         /// Get the pointers for YUV, based on the format.
@@ -572,7 +572,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_GetYUVPointers(
-            NvCVImageS im,
+            NvCVImage im,
             IntPtr y,
             IntPtr u, 
             IntPtr v,
@@ -603,9 +603,88 @@ namespace NvidiaMaxine.VideoEffects
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Sharpen(
             float sharpness, 
-            NvCVImageS src,
-            NvCVImageS dst,
+            NvCVImage src,
+            NvCVImage dst,
             CUstream_st stream,
-            NvCVImageS tmp);
+            NvCVImage tmp);
+
+        /// <summary>
+        /// Utility to determine the D3D format from the NvCVImage format, type and layout.
+        /// </summary>
+        /// <param name="format">The pixel format.</param>
+        /// <param name="type">The component type.</param>
+        /// <param name="layout">The layout.</param>
+        /// <param name="d3dFormat">The place to store the corresponding D3D format.</param>
+        /// <returns>NvCVStatus. NVCV_SUCCESS if successful.</returns>
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_ToD3DFormat(
+            NvCVImagePixelFormat format, 
+            NvCVImageComponentType type, 
+            NvCVLayout layout, 
+            IntPtr /*DXGI_FORMAT* */ d3dFormat);
+        
+        /// <summary>
+        /// Utility to determine the NvCVImage format, component type and layout from a D3D format.
+        /// </summary>
+        /// <param name="d3dFormat">The D3D format to translate.</param>
+        /// <param name="format">The place to store the NvCVImage pixel format.</param>
+        /// <param name="type">The place to store the NvCVImage component type.</param>
+        /// <param name="layout">The place to store the NvCVImage layout.</param>
+        /// <returns>NvCVStatus. NVCV_SUCCESS if successful.</returns>
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_FromD3DFormat(
+            IntPtr /*DXGI_FORMAT*/ d3dFormat, 
+            out NvCVImagePixelFormat format, 
+            out NvCVImageComponentType type, 
+            out NvCVLayout layout);
+
+        /// <summary>
+        /// Utility to determine the D3D color space from the NvCVImage color space.
+        /// </summary>
+        /// <param name="nvcvColorSpace">The color space.</param>
+        /// <param name="pD3dColorSpace">The place to store the resultant D3D color space.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if successful.
+        /// NVCV_ERR_PIXELFORMAT if there is no equivalent color space.
+        /// </returns>
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_ToD3DColorSpace(
+            uint nvcvColorSpace, 
+            IntPtr /*DXGI_COLOR_SPACE_TYPE* */ pD3dColorSpace);
+
+        /// <summary>
+        /// Utility to determine the NvCVImage color space from the D3D color space.
+        /// </summary>
+        /// <param name="d3dColorSpace">The D3D color space.</param>
+        /// <param name="pNvcvColorSpace">The place to store the resultant NvCVImage color space.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if successful.
+        /// NVCV_ERR_PIXELFORMAT if there is no equivalent color space.
+        /// </returns>
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_FromD3DColorSpace(
+            IntPtr /* DXGI_COLOR_SPACE_TYPE*/ d3dColorSpace, 
+            uint pNvcvColorSpace);
+
+        /// <summary>
+        /// Initialize an NvCVImage from a D3D11 texture.
+        /// The pixelFormat and component types with be transferred over, and a cudaGraphicsResource will be registered;
+        /// the NvCVImage destructor will unregister the resource.
+        /// It is necessary to call NvCVImage_MapResource() after rendering D3D and before calling  NvCVImage_Transfer(),
+        /// and to call NvCVImage_UnmapResource() before rendering in D3D again.
+        /// </summary>
+        /// <param name="im">The image to be initialized.</param>
+        /// <param name="tx">The texture to be used for initialization.</param>
+        /// <returns>NvCVStatus. NVCV_SUCCESS if successful.</returns>
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_InitFromD3D11Texture(
+            NvCVImage im, 
+            object /*ID3D11Texture2D* */ tx);
+
+
+
+
     }
 }
