@@ -174,6 +174,284 @@ namespace NvidiaMaxine.VideoEffects
             string paramName, 
             /*CUstream*/ object stream);
 
+        /// <summary>
+        /// Set the selected image descriptor. A shallow copy of the descriptor is made (preserving the pixel pointer), so that an ephemeral NvVFXImage_Init()
+        /// wrapper may be used in the call to NvVFX_SetImage() if desired, without having to preserve it for the lifetime
+        /// of the effect. The effect does not take ownership of the pixel buffer.
+        /// </summary>
+        /// <param name="effect">The effect to configure.</param>
+        /// <param name="paramName">The selector of the effect image to configure.</param>
+        /// <param name="im">Pointer to the image descriptor to be used for the selected effect image. NULL clears the selected internal image descriptor.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_SetImage(NvVFXHandle effect, string paramName, NvCVImage im);
 
+        /// <summary>
+        /// Set the value of the selected string, by making a copy in the effect handle.
+        /// </summary>
+        /// <param name="effect">The effect to configure.</param>
+        /// <param name="paramName">The selector of the effect string to configure.</param>
+        /// <param name="str">The value to be assigned to the selected effect string. NULL clears the selected string.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_SetString(
+            NvVFXHandle effect,
+            [MarshalAs(UnmanagedType.LPStr)] string paramName, 
+            [MarshalAs(UnmanagedType.LPStr)] string str);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetU32(NvVFXHandle effect, string paramName, out uint val);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetS32(NvVFXHandle effect, string paramName, out int val);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetF32(NvVFXHandle effect, string paramName, out float val);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetF64(NvVFXHandle effect, string paramName, out double val);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetU64(NvVFXHandle effect, string paramName, out ulong val);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetObject(NvVFXHandle effect, string paramName, IntPtr ptr);
+
+        /// <summary>
+        /// Get the value of the selected parameter.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect parameter to retrieve.</param>
+        /// <param name="val">The place to store the retrieved parameter.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetCudaStream(NvVFXHandle effect, string paramName, out /*CUstream*/ object stream);
+
+        /// <summary>
+        /// Get a copy of the selected image descriptor. 
+        /// If GetImage() is called before SetImage(), the returned descriptor will be filled with zeros.
+        /// Otherwise, the values will be identical to that in the previous SetImage() call,
+        /// with the exception of deletePtr, deleteProc and bufferBytes, which will be 0.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect image to retrieve.</param>
+        /// <param name="im">The place to store the selected image descriptor. A pointer to an empty NvCVImage 
+        /// (deletePtr==NULL) should be supplied to avoid memory leaks.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetImage(NvVFXHandle effect, string paramName, NvCVImage im);
+
+        /// <summary>
+        /// Get the specified string. If GetString() is called before SetString(), the returned string will be empty.
+        /// Otherwise, the string will be identical to that in the previous SetString() call,
+        /// though it will be stored in a different location.
+        /// </summary>
+        /// <param name="effect">The effect to be queried.</param>
+        /// <param name="paramName">The selector of the effect string to retrieve.</param>
+        /// <param name="str">The place to store a pointer to the selected string.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// NVCV_ERR_SELECTOR if the chosen effect does not understand the specified selector and data type.
+        /// NVCV_ERR_PARAMETER if the value was out of range.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_GetString(
+            NvVFXHandle effect, 
+            string paramName, 
+            out string str);
+
+        /// <summary>
+        /// Run the selected effect.
+        /// </summary>
+        /// <param name="effect">The effect object handle.</param>
+        /// <param name="async">Run the effect asynchronously if nonzero; otherwise run synchronously.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_Run(NvVFXHandle effect, int async);
+
+        /// <summary>
+        /// Load the model based on the set params.
+        /// </summary>
+        /// <param name="effect">The effect object handle.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_Load(NvVFXHandle effect);
+
+        /// <summary>
+        /// Wrapper for cudaStreamCreate(), if it is desired to avoid linking with the cuda lib.
+        /// </summary>
+        /// <param name="stream">A place to store the newly allocated stream.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful,
+        /// NVCV_ERR_CUDA_VALUE if not.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_CudaStreamCreate(/*CUstream*/ object stream);
+
+        /// <summary>
+        /// Wrapper for cudaStreamDestroy(), if it is desired to avoid linking with the cuda lib.
+        /// </summary>
+        /// <param name="stream">The stream to destroy.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful,
+        /// NVCV_ERR_CUDA_VALUE if not.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_CudaStreamDestroy(/*CUstream*/ object stream);
+
+        /// <summary>
+        /// Allocate the state object handle for a feature.
+        /// </summary>
+        /// <param name="effect">The effect object handle.</param>
+        /// <param name="handle">The handle to the state object.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_AllocateState(NvVFXHandle effect, out NvVFXStateObjectHandle handle);
+
+        /// <summary>
+        /// Deallocate the state object handle for stateful feature.
+        /// </summary>
+        /// <param name="effect">The effect object handle.</param>
+        /// <param name="handle">The handle to the state object.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_DeallocateState(NvVFXHandle effect, NvVFXStateObjectHandle handle);
+
+        /// <summary>
+        /// Reset the state object handle for stateful feature.
+        /// </summary>
+        /// <param name="effect">The effect object handle.</param>
+        /// <param name="handle">The handle to the state object.</param>
+        /// <returns>
+        /// NvCVStatus.
+        /// NVCV_SUCCESS if the operation was successful.
+        /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
+        /// </returns>
+        [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvVFX_ResetState(NvVFXHandle effect, NvVFXStateObjectHandle handle);
+
+        
     }
 }
