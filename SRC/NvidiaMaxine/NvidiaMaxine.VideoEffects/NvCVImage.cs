@@ -49,7 +49,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <summary>
         /// NVCV_CHUNKY, NVCV_PLANAR, NVCV_UYVY, ....
         /// </summary>
-        public byte Planar = 0;
+        public NvCVLayout Planar = NvCVLayout.NVCV_INTERLEAVED;
 
         /// <summary>
         /// NVCV_CPU, NVCV_CPU_PINNED, NVCV_CUDA, NVCV_GPU.
