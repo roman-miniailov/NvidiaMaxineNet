@@ -31,14 +31,14 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="effect">The handle to the Video Effect instantiation.</param>
         /// <returns>NvCVStatus. NVCV_SUCCESS if the operation was successful.</returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_CreateEffect(string code, out NvVFXHandle effect);
+        public static extern NvCVStatus NvVFX_CreateEffect(string code, out IntPtr effect);
 
         /// <summary>
         /// Delete a previously allocated video effect.
         /// </summary>
         /// <param name="effect">The effect a handle to the video effect to be deleted.</param>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NvVFX_DestroyEffect(NvVFXHandle effect);
+        public static extern void NvVFX_DestroyEffect(IntPtr effect);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -54,7 +54,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetU32(NvVFXHandle effect, string paramName, uint val);
+        public static extern NvCVStatus NvVFX_SetU32(IntPtr effect, string paramName, uint val);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -70,7 +70,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetS32(NvVFXHandle effect, string paramName, int val);
+        public static extern NvCVStatus NvVFX_SetS32(IntPtr effect, string paramName, int val);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -86,7 +86,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetF32(NvVFXHandle effect, string paramName, float val);
+        public static extern NvCVStatus NvVFX_SetF32(IntPtr effect, string paramName, float val);
         
         /// <summary>
         /// Set the value of the selected parameter.
@@ -102,7 +102,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetF64(NvVFXHandle effect, string paramName, double val);
+        public static extern NvCVStatus NvVFX_SetF64(IntPtr effect, string paramName, double val);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -118,7 +118,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetU64(NvVFXHandle effect, string paramName, ulong val);
+        public static extern NvCVStatus NvVFX_SetU64(IntPtr effect, string paramName, ulong val);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -134,7 +134,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetObject(NvVFXHandle effect, string paramName, IntPtr ptr);
+        public static extern NvCVStatus NvVFX_SetObject(IntPtr effect, string paramName, IntPtr[] ptr);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -151,7 +151,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetStateObjectHandleArray(
-            NvVFXHandle effect, 
+            IntPtr effect, 
             string paramName,
             /* NvVFX_StateObjectHandle* */ object handle);
 
@@ -170,7 +170,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetCudaStream(
-            NvVFXHandle effect, 
+            IntPtr effect, 
             string paramName, 
             /*CUstream*/ object stream);
 
@@ -190,7 +190,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetImage(NvVFXHandle effect, string paramName, NvCVImage im);
+        public static extern NvCVStatus NvVFX_SetImage(IntPtr effect, string paramName, NvCVImage im);
 
         /// <summary>
         /// Set the value of the selected string, by making a copy in the effect handle.
@@ -207,7 +207,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetString(
-            NvVFXHandle effect,
+            IntPtr effect,
             [MarshalAs(UnmanagedType.LPStr)] string paramName, 
             [MarshalAs(UnmanagedType.LPStr)] string str);
 
@@ -225,7 +225,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetU32(NvVFXHandle effect, string paramName, out uint val);
+        public static extern NvCVStatus NvVFX_GetU32(IntPtr effect, string paramName, out uint val);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -241,7 +241,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetS32(NvVFXHandle effect, string paramName, out int val);
+        public static extern NvCVStatus NvVFX_GetS32(IntPtr effect, string paramName, out int val);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -257,7 +257,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetF32(NvVFXHandle effect, string paramName, out float val);
+        public static extern NvCVStatus NvVFX_GetF32(IntPtr effect, string paramName, out float val);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -273,7 +273,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetF64(NvVFXHandle effect, string paramName, out double val);
+        public static extern NvCVStatus NvVFX_GetF64(IntPtr effect, string paramName, out double val);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -289,7 +289,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetU64(NvVFXHandle effect, string paramName, out ulong val);
+        public static extern NvCVStatus NvVFX_GetU64(IntPtr effect, string paramName, out ulong val);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -305,7 +305,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetObject(NvVFXHandle effect, string paramName, IntPtr ptr);
+        public static extern NvCVStatus NvVFX_GetObject(IntPtr effect, string paramName, IntPtr ptr);
 
         /// <summary>
         /// Get the value of the selected parameter.
@@ -321,7 +321,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetCudaStream(NvVFXHandle effect, string paramName, out /*CUstream*/ object stream);
+        public static extern NvCVStatus NvVFX_GetCudaStream(IntPtr effect, string paramName, out /*CUstream*/ object stream);
 
         /// <summary>
         /// Get a copy of the selected image descriptor. 
@@ -341,7 +341,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetImage(NvVFXHandle effect, string paramName, NvCVImage im);
+        public static extern NvCVStatus NvVFX_GetImage(IntPtr effect, string paramName, NvCVImage im);
 
         /// <summary>
         /// Get the specified string. If GetString() is called before SetString(), the returned string will be empty.
@@ -360,7 +360,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_GetString(
-            NvVFXHandle effect, 
+            IntPtr effect, 
             string paramName, 
             out string str);
 
@@ -375,7 +375,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_Run(NvVFXHandle effect, int async);
+        public static extern NvCVStatus NvVFX_Run(IntPtr effect, int async);
 
         /// <summary>
         /// Load the model based on the set params.
@@ -387,7 +387,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_Load(NvVFXHandle effect);
+        public static extern NvCVStatus NvVFX_Load(IntPtr effect);
 
         /// <summary>
         /// Wrapper for cudaStreamCreate(), if it is desired to avoid linking with the cuda lib.
@@ -424,7 +424,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_AllocateState(NvVFXHandle effect, out NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_AllocateState(IntPtr effect, out NvVFXStateObjectHandle handle);
 
         /// <summary>
         /// Deallocate the state object handle for stateful feature.
@@ -437,7 +437,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_DeallocateState(NvVFXHandle effect, NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_DeallocateState(IntPtr effect, NvVFXStateObjectHandle handle);
 
         /// <summary>
         /// Reset the state object handle for stateful feature.
@@ -450,7 +450,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_ResetState(NvVFXHandle effect, NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_ResetState(IntPtr effect, NvVFXStateObjectHandle handle);
 
         
     }

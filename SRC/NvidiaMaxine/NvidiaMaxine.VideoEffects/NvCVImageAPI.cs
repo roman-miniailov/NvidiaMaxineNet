@@ -151,7 +151,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="im">The image whose buffer is to be deallocated.</param>
         /// <param name="stream">The CUDA stream on which the image buffer is to be deallocated.</param>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NvCVImage_DeallocAsync(NvCVImage im, CUstream_st stream);
+        public static extern void NvCVImage_DeallocAsync(NvCVImage im, IntPtr stream);
 
         /// <summary>
         /// Allocate a new image, with storage (C-style constructor).
@@ -298,8 +298,8 @@ namespace NvidiaMaxine.VideoEffects
              NvCVImage src, 
              NvCVImage dst, 
              float scale, 
-             CUstream_st stream, 
-             ref NvCVImage tmp);
+             IntPtr stream, 
+             NvCVImage tmp);
 
         /// <summary>
         /// Transfer a rectangular portion of an image. See NvCVImage_Transfer() for the pixel format combinations that are implemented.
@@ -322,8 +322,8 @@ namespace NvidiaMaxine.VideoEffects
             NvCVRect2i srcRect,
             NvCVImage dst,
             NvCVPoint2i dstPt,
-            float scale, 
-            CUstream_st stream,
+            float scale,
+            IntPtr stream,
             NvCVImage tmp);
 
         /// <summary>
@@ -366,8 +366,8 @@ namespace NvidiaMaxine.VideoEffects
             NvCVMemSpace yuvMemSpace,
             out NvCVImage dst, 
             NvCVRect2i dstRect, 
-            float scale, 
-            CUstream_st stream, 
+            float scale,
+            IntPtr stream, 
             NvCVImage tmp);
 
         /// <summary>
@@ -410,8 +410,8 @@ namespace NvidiaMaxine.VideoEffects
             NvCVImageComponentType yuvType,
             uint yuvColorSpace, 
             NvCVMemSpace yuvMemSpace,
-            float scale, 
-            CUstream_st stream, 
+            float scale,
+            IntPtr stream, 
             NvCVImage tmp);
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="stream">The stream on which the mapping is to be performed.</param>
         /// <returns>NvCVStatus. NVCV_SUCCESS is the operation was completed successfully.</returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvCVImage_MapResource(NvCVImage im, CUstream_st stream);
+        public static extern NvCVStatus NvCVImage_MapResource(NvCVImage im, IntPtr stream);
 
         /// <summary>
         /// After transfer by CUDA, the texture resource must be unmapped in order to be used by the graphics system again.
@@ -434,7 +434,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="stream">The CUDA stream on which the mapping is to be performed.</param>
         /// <returns>NvCVStatus. NVCV_SUCCESS is the operation was completed successfully.</returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvCVImage_UnmapResource(NvCVImage im, CUstream_st stream);
+        public static extern NvCVStatus NvCVImage_UnmapResource(NvCVImage im, IntPtr stream);
 
 
         /// <summary>
@@ -461,7 +461,7 @@ namespace NvidiaMaxine.VideoEffects
             NvCVImage bg,
             NvCVImage mat,
             out NvCVImage dst,
-            CUstream_st stream);
+            IntPtr stream);
 
         /// <summary>
         /// Composite one source image over another using the given matte.
@@ -502,7 +502,7 @@ namespace NvidiaMaxine.VideoEffects
             uint mode,
             out NvCVImage dst,
             NvCVPoint2i dstOrg,
-            CUstream_st stream);
+            IntPtr stream);
 
         /// <summary>
         /// Composite a source image over a constant color field using the given matte.
@@ -532,8 +532,8 @@ namespace NvidiaMaxine.VideoEffects
             NvCVImage src, 
             NvCVImage mat,
             IntPtr bgColor, 
-            ref NvCVImage dst, 
-            CUstream_st stream);
+            ref NvCVImage dst,
+            IntPtr stream);
 
         /// <summary>
         /// Flip the image vertically. No actual pixels are moved: it is just an accounting procedure.
@@ -605,7 +605,7 @@ namespace NvidiaMaxine.VideoEffects
             float sharpness, 
             NvCVImage src,
             NvCVImage dst,
-            CUstream_st stream,
+            IntPtr stream,
             NvCVImage tmp);
 
         /// <summary>

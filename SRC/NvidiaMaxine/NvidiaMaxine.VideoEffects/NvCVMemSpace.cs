@@ -3,7 +3,7 @@
     /// <summary>
     /// MemSpace.
     /// </summary>
-    public enum NvCVMemSpace
+    public enum NvCVMemSpace : byte
     {
         /// <summary>
         /// The buffer is stored in CPU memory.

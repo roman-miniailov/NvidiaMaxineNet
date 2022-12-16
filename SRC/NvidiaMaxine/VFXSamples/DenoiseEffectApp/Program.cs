@@ -1,35 +1,82 @@
-﻿using OpenCvSharp;
+﻿using NvidiaMaxine.VideoEffects;
+using OpenCvSharp;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection.PortableExecutable;
 
 namespace DenoiseEffectApp
 {
     internal class Program
     {
-        private static string DEFAULT_CODEC = "avc1";
+        private static Context Context;
         //#define DEFAULT_CODEC "H264"
-
-        private static bool FLAG_debug = false;
-        private static bool FLAG_verbose = false;
-        private static bool FLAG_show = false;
-        private static bool FLAG_progress = false;
-        private static bool FLAG_webcam = false;
-        private static float FLAG_strength = 0.0f;
-        private static string FLAG_codec = DEFAULT_CODEC;
-        private static string FLAG_camRes = "1280x720";
-        private static string FLAG_inFile;
-        private static string FLAG_outFile;
-        private static string FLAG_outDir;
-        private static string FLAG_modelDir;
 
         static void Main(string[] args)
         {
+            Err fxErr = Err.errNone;
+            int nErrs = 0;
+            FXApp app = new FXApp();
 
+            //nErrs = ParseMyArgs(argc, argv);
+            //if (nErrs)
+            //    std::cerr << nErrs << " command line syntax problems\n";
 
+            if (Context.Webcam)
+            {
+                // If webcam is on, enable showing the results and turn off displaying the progress
+                if (Context.Progress)
+                {
+                    Context.Progress = !Context.Progress;
+                }
+
+                if (!Context.Show)
+                {
+                    Context.Show = !Context.Show;
+                }
+
+            }
+            if (string.IsNullOrEmpty(Context.InFile) && !Context.Webcam)
+            {
+                Console.WriteLine("Please specify --in_file=XXX or --webcam=true");
+                ++nErrs;
+            }
+            if (string.IsNullOrEmpty(Context.OutFile) && !Context.Show)
+            {
+                Console.WriteLine("Please specify --out_file=XXX or --show");
+                ++nErrs;
+            }
+
+            app._progress = Context.Progress;
+            app.setShow(Context.Show);
+
+            if (nErrs > 0)
+            {
+                Usage();
+                fxErr = Err.errFlag;
+            }
+            else
+            {
+                fxErr = app.createEffect(NvVFXFilterSelectors.NVVFX_FX_DENOISING, Context.ModelDir);
+                if (Err.errNone != fxErr)
+                {
+                    Console.WriteLine("Error creating effect");
+                }
+                else
+                {
+                    if (Helpers.IsImageFile(Context.InFile))
+                        fxErr = app.processImage(Context.InFile, Context.OutFile, Context.Strength);
+                    else
+                        fxErr = app.processMovie(Context);
+                }
+            }
+
+            if (fxErr > 0)
+            {
+                Console.WriteLine("Error: " + app.errorStringFromCode(fxErr));
+            }
         }
-
         static void Usage()
         {
             Console.WriteLine("DenoiseEffectApp [args ...]\n" +
@@ -40,79 +87,11 @@ namespace DenoiseEffectApp
               "  --show                     display the results in a window (for webcam, it is always true)\n" +
               "  --strength=<value>         strength of an effect [0-1]\n" +
               "  --model_dir=<path>         the path to the directory that contains the models\n" +
-              "  --codec=<fourcc>           the fourcc code for the desired codec (default " + DEFAULT_CODEC + ")\n" +
+              "  --codec=<fourcc>           the fourcc code for the desired codec (default " + Context.DEFAULT_CODEC + ")\n" +
               "  --progress                 show progress\n" +
               "  --verbose                  verbose output\n" +
               "  --debug                    print extra debugging information\n"
             );
         }
-
-        static bool HasSuffix(string str, string suf)
-        {
-            return Path.GetExtension(str).ToLowerInvariant() == suf.ToLowerInvariant();
-        }
-
-        static bool HasOneOfTheseSuffixes(string str, string[] suffx)
-        {
-            foreach (var suf in suffx)
-            {
-                if (HasSuffix(str, suf))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        static bool IsImageFile(string str)
-        {
-            return HasOneOfTheseSuffixes(str, new[] { ".bmp", ".jpg", ".jpeg", ".png" });
-        }
-
-        static bool IsLossyImageFile(string str)
-        {
-            return HasOneOfTheseSuffixes(str, new[] { ".jpg", ".jpeg" });
-        }
-
-        static string DurationString(double sc)
-        {
-            string buf;
-            int hr, mn;
-            hr = (int)(sc / 3600.0);
-            sc -= hr * 3600.0;
-            mn = (int)(sc / 60.0);
-            sc -= mn * 60.0;
-            buf = string.Format("%02d:%02d:%06.3f", hr, mn, sc);
-            return buf;
-        }
-
-        static void GetVideoInfo(VideoCapture reader, string fileName, out VideoInfo info)
-        {
-            info.Codec = (int)reader.Get(VideoCaptureProperties.FourCC);
-            info.Width = (int)reader.Get(VideoCaptureProperties.FrameWidth);
-            info.Height = (int)reader.Get(VideoCaptureProperties.FrameHeight);
-            info.FrameRate = (double)reader.Get(VideoCaptureProperties.Fps);
-            info.FrameCount = (long)reader.Get(VideoCaptureProperties.FrameCount);
-
-            if (FLAG_verbose)
-                Console.WriteLine(
-                  "       file \"%s\"\n" +
-                  "      codec %.4s\n" +
-                  "      width %4d\n" +
-                  "     height %4d\n" +
-                  " frame rate %.3f\n" +
-                  "frame count %4lld\n" +
-                  "   duration %s\n",
-                  fileName, info.Codec, info.Width, info.Height, info.FrameRate, info.FrameCount,
-                  DurationString(info.FrameCount / info.FrameRate)
-                );
-        }
-
-
-
-
-
-
     }
 }

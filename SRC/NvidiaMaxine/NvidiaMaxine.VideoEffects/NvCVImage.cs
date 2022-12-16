@@ -54,7 +54,7 @@ namespace NvidiaMaxine.VideoEffects
         /// <summary>
         /// NVCV_CPU, NVCV_CPU_PINNED, NVCV_CUDA, NVCV_GPU.
         /// </summary>
-        public byte GpuMem = 0;
+        public NvCVMemSpace GpuMem = 0;
 
         /// <summary>
         /// An OR of colorspace, range and chroma phase.
@@ -79,12 +79,12 @@ namespace NvidiaMaxine.VideoEffects
         /// <summary>
         /// Buffer memory to be deleted (can be NULL).
         /// </summary>
-        public IntPtr DeletePtr = IntPtr.Zero;
+        public object DeletePtr = null;
 
         /// <summary>
         ///  Delete procedure to call rather than free().
         /// </summary>
-        public IntPtr DeleteProc = IntPtr.Zero; // (* deleteProc) (void* p);
+        public object DeleteProc = null; // (* deleteProc) (void* p);
 
         /// <summary>
         /// The maximum amount of memory available through pixels.
@@ -162,7 +162,7 @@ namespace NvidiaMaxine.VideoEffects
             int dstY,
             int wd,
             int ht,
-            CUstream_st stream)
+            IntPtr stream)
         {
             NvCVRect2i srcRect = new NvCVRect2i(srcX, srcY, wd, ht);
             NvCVPoint2i dstPt = new NvCVPoint2i(dstX, dstY);
@@ -180,10 +180,10 @@ namespace NvidiaMaxine.VideoEffects
         /// <param name="src">The source.</param>
         /// <param name="stream">The stream.</param>
         /// <returns>NvCVStatus.</returns>
-        public NvCVStatus CopyFrom(NvCVImage src, CUstream_st stream)
+        public NvCVStatus CopyFrom(NvCVImage src, IntPtr stream)
         {
             var tmp = new NvCVImage();
-            var res = NvCVImageAPI.NvCVImage_Transfer(src, this, 1.0f, stream, ref tmp);
+            var res = NvCVImageAPI.NvCVImage_Transfer(src, this, 1.0f, stream, tmp);
             tmp.Destroy();
 
             return res;

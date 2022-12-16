@@ -9,7 +9,7 @@ namespace NvidiaMaxine.VideoEffects
     /// <summary>
     /// FourCC/layout.
     /// </summary>
-    public enum NvCVLayout
+    public enum NvCVLayout : byte
     {
         /// <summary>
         /// All components of pixel(x,y) are adjacent (same as chunky) (default for non-YUV).

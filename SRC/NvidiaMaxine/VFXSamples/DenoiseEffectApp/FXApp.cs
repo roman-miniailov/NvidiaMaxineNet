@@ -1,9 +1,12 @@
-﻿using DenoiseEffectApp;
+﻿using CUDA;
+using DenoiseEffectApp;
 using NvidiaMaxine.VideoEffects;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,46 +14,7 @@ namespace DenoiseEffectApp
 {
     internal class FXApp
     {
-        enum Err
-        {
-            errQuit = +1,                         // Application errors
-            errFlag = +2,
-            errRead = +3,
-            errWrite = +4,
-            errNone = NvCVStatus.NVCV_SUCCESS,               // Video Effects SDK errors
-            errGeneral = NvCVStatus.NVCV_ERR_GENERAL,
-            errUnimplemented = NvCVStatus.NVCV_ERR_UNIMPLEMENTED,
-            errMemory = NvCVStatus.NVCV_ERR_MEMORY,
-            errEffect = NvCVStatus.NVCV_ERR_EFFECT,
-            errSelector = NvCVStatus.NVCV_ERR_SELECTOR,
-            errBuffer = NvCVStatus.NVCV_ERR_BUFFER,
-            errParameter = NvCVStatus.NVCV_ERR_PARAMETER,
-            errMismatch = NvCVStatus.NVCV_ERR_MISMATCH,
-            errPixelFormat = NvCVStatus.NVCV_ERR_PIXELFORMAT,
-            errModel = NvCVStatus.NVCV_ERR_MODEL,
-            errLibrary = NvCVStatus.NVCV_ERR_LIBRARY,
-            errInitialization = NvCVStatus.NVCV_ERR_INITIALIZATION,
-            errFileNotFound = NvCVStatus.NVCV_ERR_FILE,
-            errFeatureNotFound = NvCVStatus.NVCV_ERR_FEATURENOTFOUND,
-            errMissingInput = NvCVStatus.NVCV_ERR_MISSINGINPUT,
-            errResolution = NvCVStatus.NVCV_ERR_RESOLUTION,
-            errUnsupportedGPU = NvCVStatus.NVCV_ERR_UNSUPPORTEDGPU,
-            errWrongGPU = NvCVStatus.NVCV_ERR_WRONGGPU,
-            errUnsupportedDriver = NvCVStatus.NVCV_ERR_UNSUPPORTEDDRIVER,
-            errCudaMemory = NvCVStatus.NVCV_ERR_CUDA_MEMORY,       // CUDA errors
-            errCudaValue = NvCVStatus.NVCV_ERR_CUDA_VALUE,
-            errCudaPitch = NvCVStatus.NVCV_ERR_CUDA_PITCH,
-            errCudaInit = NvCVStatus.NVCV_ERR_CUDA_INIT,
-            errCudaLaunch = NvCVStatus.NVCV_ERR_CUDA_LAUNCH,
-            errCudaKernel = NvCVStatus.NVCV_ERR_CUDA_KERNEL,
-            errCudaDriver = NvCVStatus.NVCV_ERR_CUDA_DRIVER,
-            errCudaUnsupported = NvCVStatus.NVCV_ERR_CUDA_UNSUPPORTED,
-            errCudaIllegalAddress = NvCVStatus.NVCV_ERR_CUDA_ILLEGAL_ADDRESS,
-            errCuda = NvCVStatus.NVCV_ERR_CUDA,
-        };
-
-
-        NvVFXHandle _eff;
+        IntPtr _eff;
         Mat _srcImg;
         Mat _dstImg;
         NvCVImage _srcGpuBuf;
@@ -61,14 +25,14 @@ namespace DenoiseEffectApp
         bool _show;
         bool _inited;
         bool _showFPS;
-        bool _progress;
+        public bool _progress;
         bool _enableEffect;
         bool _drawVisualization;
         string _effectName;
         float _framePeriod;
         TimeSpan _lastTime;
 
-        FXApp()
+        public FXApp()
         {
             //_eff = null; 
             _effectName = null;
@@ -86,7 +50,7 @@ namespace DenoiseEffectApp
             NvVFXAPI.NvVFX_DestroyEffect(_eff);
         }
 
-        private string errorStringFromCode(Err code)
+        public string errorStringFromCode(Err code)
         {
             switch (code)
             {
@@ -237,7 +201,7 @@ namespace DenoiseEffectApp
             }
         }
 
-        Err createEffect(string effectSelector, string modelDir)
+        public Err createEffect(string effectSelector, string modelDir)
         {
             NvCVStatus vfxErr;
             vfxErr = NvVFXAPI.NvVFX_CreateEffect(effectSelector, out _eff);
@@ -250,7 +214,7 @@ namespace DenoiseEffectApp
                 vfxErr = NvVFXAPI.NvVFX_SetString(_eff, NvVFXParameterSelectors.NVVFX_MODEL_DIRECTORY, modelDir);
                 CheckResult(vfxErr);
             }
-                        
+
             return appErrFromVfxStatus(vfxErr);
         }
 
@@ -272,40 +236,280 @@ namespace DenoiseEffectApp
 
             vfxErr = NvCVImageAPI.NvCVImage_Realloc(_tmpVFX, _srcVFX.Width, _srcVFX.Height, _srcVFX.PixelFormat, _srcVFX.ComponentType, _srcVFX.Planar, NvCVMemSpace.NVCV_GPU, 0);
             CheckResult(vfxErr);
-        
+
             return vfxErr;
         }
 
-        NvCVStatus allocBuffers(uint width, uint height)
+        void NVWrapperForCVMat(Mat cvIm, NvCVImage nvcvIm)
         {
-            NvCV_Status vfxErr = NVCV_SUCCESS;
+            NvCVImagePixelFormat[] nvFormat = new[] { NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN, NvCVImagePixelFormat.NVCV_Y, NvCVImagePixelFormat.NVCV_YA, NvCVImagePixelFormat.NVCV_BGR, NvCVImagePixelFormat.NVCV_BGRA };
+            NvCVImageComponentType[] nvType = new[] { NvCVImageComponentType.NVCV_U8, NvCVImageComponentType.NVCV_TYPE_UNKNOWN, NvCVImageComponentType.NVCV_U16, NvCVImageComponentType.NVCV_S16, NvCVImageComponentType.NVCV_S32,
+              NvCVImageComponentType.NVCV_F32, NvCVImageComponentType.NVCV_F64, NvCVImageComponentType.NVCV_TYPE_UNKNOWN };
+
+            nvcvIm.Pixels = cvIm.Data;
+            nvcvIm.Width = (uint)cvIm.Cols;
+            nvcvIm.Height = (uint)cvIm.Rows;
+            nvcvIm.Pitch = (int)cvIm.Step(0);
+            nvcvIm.PixelFormat = nvFormat[cvIm.Channels() <= 4 ? cvIm.Channels() : 0];
+            nvcvIm.ComponentType = nvType[cvIm.Depth() & 7];
+            nvcvIm.BufferBytes = 0;
+            nvcvIm.DeletePtr = null;
+            nvcvIm.DeleteProc = null;
+            nvcvIm.PixelBytes = (byte)cvIm.Step(1);
+            nvcvIm.ComponentBytes = (byte)cvIm.ElemSize1();
+            nvcvIm.NumComponents = (byte)cvIm.Channels();
+            nvcvIm.Planar = NvCVLayout.NVCV_CHUNKY;
+            nvcvIm.GpuMem = NvCVMemSpace.NVCV_CPU;
+            nvcvIm.Reserved1 = 0;
+            nvcvIm.Reserved2 = 0;
+        }
+
+        NvCVStatus allocBuffers(int width, int height)
+        {
+            NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
 
             if (_inited)
-                return NVCV_SUCCESS;
-
-            if (!_srcImg.data)
             {
-                _srcImg.create(height, width, CV_8UC3);                                                                                        // src CPU
-                BAIL_IF_NULL(_srcImg.data, vfxErr, NVCV_ERR_MEMORY);
+                return NvCVStatus.NVCV_SUCCESS;
             }
 
-            _dstImg.create(_srcImg.rows, _srcImg.cols, _srcImg.type()); // 
-            BAIL_IF_NULL(_dstImg.data, vfxErr, NVCV_ERR_MEMORY); // 
-            BAIL_IF_ERR(vfxErr = NvCVImage_Alloc(&_srcGpuBuf, _srcImg.cols, _srcImg.rows, NVCV_BGR, NVCV_F32, NVCV_PLANAR, NVCV_GPU, 1));  // src GPU
-            BAIL_IF_ERR(vfxErr = NvCVImage_Alloc(&_dstGpuBuf, _srcImg.cols, _srcImg.rows, NVCV_BGR, NVCV_F32, NVCV_PLANAR, NVCV_GPU, 1)); //dst GPU
+            if (_srcImg.Data == IntPtr.Zero)
+            {
+                // src CPU
+                _srcImg.Create(height, width, MatType.CV_8UC3);
 
-            NVWrapperForCVMat(&_srcImg, &_srcVFX);      // _srcVFX is an alias for _srcImg
-            NVWrapperForCVMat(&_dstImg, &_dstVFX);      // _dstVFX is an alias for _dstImg
+                if (_srcImg.Data == IntPtr.Zero)
+                {
+                    return NvCVStatus.NVCV_ERR_MEMORY;
+                };
+            }
+
+            _dstImg.Create(_srcImg.Rows, _srcImg.Cols, _srcImg.Type());
+            if (_dstImg.Data == IntPtr.Zero)
+            {
+                return NvCVStatus.NVCV_ERR_MEMORY;
+            };
+
+            // src GPU
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(_srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+
+            //dst GPU
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(_dstGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+
+            NVWrapperForCVMat(_srcImg, _srcVFX);      // _srcVFX is an alias for _srcImg
+            NVWrapperForCVMat(_dstImg, _dstVFX);      // _dstVFX is an alias for _dstImg
 
             //#define ALLOC_TEMP_BUFFERS_AT_RUN_TIME    // Deferring temp buffer allocation is easier
-# ifndef ALLOC_TEMP_BUFFERS_AT_RUN_TIME      // Allocating temp buffers at load time avoids run time hiccups
-            BAIL_IF_ERR(vfxErr = allocTempBuffers()); // This uses _srcVFX and _dstVFX and allocates one buffer to be a temporary for src and dst
-#endif // ALLOC_TEMP_BUFFERS_AT_RUN_TIME
+            //# ifndef ALLOC_TEMP_BUFFERS_AT_RUN_TIME      // Allocating temp buffers at load time avoids run time hiccups
+            CheckResult(allocTempBuffers()); // This uses _srcVFX and _dstVFX and allocates one buffer to be a temporary for src and dst
+                                             //#endif // ALLOC_TEMP_BUFFERS_AT_RUN_TIME
 
             _inited = true;
 
-        bail:
             return vfxErr;
+        }
+
+        public void setShow(bool show) 
+        { 
+            _show = show; 
+        }
+
+        public Err processImage(string inFile, string outFile, float FLAG_strength)
+        {
+            /*CUstream*/
+            IntPtr stream = IntPtr.Zero;
+            NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
+
+            IntPtr state = IntPtr.Zero;
+            IntPtr[] stateArray = new IntPtr[1];
+
+            if (_eff == IntPtr.Zero)
+            {
+                return Err.errEffect;
+            }
+
+            _srcImg = OpenCvSharp.Cv2.ImRead(inFile);
+            if (_srcImg.Data == IntPtr.Zero)
+            {
+                return Err.errRead;
+            }
+
+            CheckResult(allocBuffers(_srcImg.Cols, _srcImg.Rows));
+            CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, stream, _tmpVFX)); // _srcVFX--> _tmpVFX --> _srcGpuBuf
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, _srcGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, _dstGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetF32(_eff, NvVFXParameterSelectors.NVVFX_STRENGTH, FLAG_strength));
+
+            uint stateSizeInBytes;
+            CheckResult(NvVFXAPI.NvVFX_GetU32(_eff, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
+            CUDA.Runtime.API.cudaMalloc(ref state, stateSizeInBytes);
+            CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);
+            stateArray[0] = state;
+            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
+
+            CheckResult(NvVFXAPI.NvVFX_Load(_eff));
+            CheckResult(NvVFXAPI.NvVFX_Run(_eff, 0));
+            CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstGpuBuf, _dstVFX, 255.0f, stream, _tmpVFX));
+
+            if (!string.IsNullOrEmpty(outFile))
+            {
+                if (Helpers.IsLossyImageFile(outFile))
+                {
+                    Console.WriteLine("WARNING: JPEG output file format will reduce image quality\n");
+                }
+
+                if (!Cv2.ImWrite(outFile, _dstImg))
+                {
+                    Console.WriteLine("Error writing: \"%s\"\n", outFile);
+                    return Err.errWrite;
+                }
+            }
+
+            if (_show)
+            {
+                Cv2.ImShow("Output", _dstImg);
+                Cv2.WaitKey(3000);
+            }
+
+            if (state != IntPtr.Zero)
+            {
+                CUDA.Runtime.API.cudaFree(state); // release state memory
+            }
+
+            return appErrFromVfxStatus(vfxErr);
+        }
+
+        public Err processMovie(Context context)
+        {
+            int fourcc_h264 = VideoWriter.FourCC('H', '2', '6', '4');
+            IntPtr stream = IntPtr.Zero;
+            Err appErr = Err.errNone;
+            bool ok;
+            VideoCapture reader = new VideoCapture();
+            VideoWriter writer = new VideoWriter();
+            NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
+            uint frameNum;
+            VideoInfo info;
+
+            IntPtr state = IntPtr.Zero;
+            IntPtr[] stateArray = new IntPtr[1];
+
+            if (!context.Webcam && !string.IsNullOrEmpty(context.InFile))
+            {
+                reader.Open(context.InFile);
+            }
+            else
+            {
+                appErr = initCamera(reader, context.CamRes);
+                if (appErr != Err.errNone)
+                {
+                    return appErr;
+                }
+            }
+
+            if (!reader.IsOpened())
+            {
+                if (!context.Webcam)
+                {
+                    Console.WriteLine($"Error: Could not open video: {context.InFile}");
+                }
+                else
+                {
+                    Console.WriteLine("Error: Webcam not found\n");
+                }
+
+                return Err.errRead;
+            }
+
+            Helpers.GetVideoInfo(reader, (!string.IsNullOrEmpty(context.InFile) ? context.InFile : "webcam"), context.Verbose, out info);
+            if (!(fourcc_h264 == info.Codec || VideoWriter.FourCC('a', 'v', 'c', '1') == info.Codec)) // avc1 is alias for h264
+            {
+                Console.WriteLine("Filters only target H264 videos, not %.4s\n", info.Codec);
+            }
+
+            CheckResult(allocBuffers(info.Width, info.Height));
+
+            if (!string.IsNullOrEmpty(context.OutFile))
+            {
+                ok = writer.Open(context.OutFile, VideoWriter.FourCC(context.Codec), info.FrameRate, new Size(_dstVFX.Width, _dstVFX.Height));
+                if (!ok)
+                {
+                    Console.WriteLine("Cannot open \"%s\" for video writing\n", context.OutFile);
+                    context.OutFile = null;
+                    if (!_show)
+                    {
+                        return Err.errWrite;
+                    }
+                }
+            }
+
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, _srcGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, _dstGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetF32(_eff, NvVFXParameterSelectors.NVVFX_STRENGTH, context.Strength));
+
+            uint stateSizeInBytes;
+            CheckResult(NvVFXAPI.NvVFX_GetU32(_eff, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
+            CUDA.Runtime.API.cudaMalloc(ref state, stateSizeInBytes);
+            CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);
+            stateArray[0] = state;
+            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
+            CheckResult(NvVFXAPI.NvVFX_Load(_eff));
+
+            for (frameNum = 0; reader.Read(_srcImg); frameNum++)
+            {
+                if (_enableEffect)
+                {
+                    CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, stream, _tmpVFX));
+                    CheckResult(NvVFXAPI.NvVFX_Run(_eff, 0));
+                    CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstGpuBuf, _dstVFX, 255.0f, stream, _tmpVFX));
+                }
+                else
+                {
+                    CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _dstVFX, 1.0f, stream, _tmpVFX));
+                    CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);// reset state by setting to 0
+                }
+
+                if (!string.IsNullOrEmpty(context.OutFile))
+                {
+                    writer.Write(_dstImg);
+                }
+
+                if (_show)
+                {
+                    if (_drawVisualization) drawEffectStatus(_dstImg);
+                    drawFrameRate(_dstImg);
+                    Cv2.ImShow("Output", _dstImg);
+                    int key = Cv2.WaitKey(1);
+                    if (key > 0)
+                    {
+                        appErr = processKey(key, context.Webcam);
+                        if (Err.errQuit == appErr)
+                            break;
+                    }
+                }
+                if (_progress)
+                {
+                    Console.WriteLine("\b\b\b\b%3.0f%%", 100.0f * frameNum / info.FrameCount);
+                }
+            }
+
+            reader.Release();
+            if (!string.IsNullOrEmpty(context.OutFile))
+            {
+                writer.Release();
+            }
+
+            if (state != IntPtr.Zero)
+            {
+                CUDA.Runtime.API.cudaFree(state); // release state memory
+            }
+
+            return appErrFromVfxStatus(vfxErr);
+        }
+
+        private Err appErrFromVfxStatus(NvCVStatus status)
+        {
+            return (Err)status;
         }
     }
 }

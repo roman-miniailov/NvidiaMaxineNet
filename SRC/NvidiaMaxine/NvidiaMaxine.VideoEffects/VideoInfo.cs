@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DenoiseEffectApp
+namespace NvidiaMaxine.VideoEffects
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VideoInfo
+    public struct VideoInfo
     {
         public int Codec;
         public int Width;
