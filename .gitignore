@@ -38,3 +38,5 @@ SDK/
 .vs/
 obj/
 bin/
+CUDAnshita/
+managedCuda/
