@@ -36,7 +36,7 @@ namespace CUDA {
 		public class API {
 			//const string DLL_PATH = "cudart64_80.dll";
 			//const string DLL_PATH = "cudart64_101.dll";
-			const string DLL_PATH = "cudart64_102.dll";
+			const string DLL_PATH = "cudart64_110.dll";
 			const CallingConvention CALLING_CONVENTION = CallingConvention.Cdecl;
 			const CharSet CHAR_SET = CharSet.Ansi;
 

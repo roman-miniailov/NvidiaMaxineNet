@@ -79,12 +79,12 @@ namespace NvidiaMaxine.VideoEffects
         /// <summary>
         /// Buffer memory to be deleted (can be NULL).
         /// </summary>
-        public object DeletePtr = null;
+        public IntPtr DeletePtr = IntPtr.Zero;
 
         /// <summary>
         ///  Delete procedure to call rather than free().
         /// </summary>
-        public object DeleteProc = null; // (* deleteProc) (void* p);
+        public IntPtr DeleteProc = IntPtr.Zero; // (* deleteProc) (void* p);
 
         /// <summary>
         /// The maximum amount of memory available through pixels.
@@ -96,8 +96,9 @@ namespace NvidiaMaxine.VideoEffects
         /// </summary>
         public NvCVImage()
         {
+            //var sz = Marshal.SizeOf(typeof(NvCVImage));
             NvCVImageAPI.NvCVImage_Alloc(
-                this,
+                ref this,
                 0,
                 0,
                 NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN,
@@ -105,6 +106,16 @@ namespace NvidiaMaxine.VideoEffects
                 0,
                 0,
                 0);
+
+            //NvCVImageAPI.NvCVImage_Alloc(
+            //    ref this,
+            //    640,
+            //    480,
+            //    NvCVImagePixelFormat.NVCV_BGR,
+            //    NvCVImageComponentType.NVCV_F32,
+            //    NvCVLayout.NVCV_PLANAR,
+            //    NvCVMemSpace.NVCV_CPU,
+            //    0);
         }
 
         /// <summary>
@@ -126,7 +137,7 @@ namespace NvidiaMaxine.VideoEffects
             NvCVMemSpace memSpace,
             uint alignment)
         {
-            NvCVImageAPI.NvCVImage_Alloc(this, width, height, format, type, layout, memSpace, alignment);
+            NvCVImageAPI.NvCVImage_Alloc(ref this, width, height, format, type, layout, memSpace, alignment);
         }
 
         /// <summary>

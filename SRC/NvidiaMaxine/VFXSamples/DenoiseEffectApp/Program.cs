@@ -23,6 +23,10 @@ namespace DenoiseEffectApp
             //if (nErrs)
             //    std::cerr << nErrs << " command line syntax problems\n";
 
+            Context = new Context();
+            Context.InFile = @"C:\samples\!video.mp4";
+            Context.OutFile = @"C:\vf\out.mp4";
+
             if (Context.Webcam)
             {
                 // If webcam is on, enable showing the results and turn off displaying the progress
@@ -35,13 +39,14 @@ namespace DenoiseEffectApp
                 {
                     Context.Show = !Context.Show;
                 }
-
             }
+            
             if (string.IsNullOrEmpty(Context.InFile) && !Context.Webcam)
             {
                 Console.WriteLine("Please specify --in_file=XXX or --webcam=true");
                 ++nErrs;
             }
+            
             if (string.IsNullOrEmpty(Context.OutFile) && !Context.Show)
             {
                 Console.WriteLine("Please specify --out_file=XXX or --show");

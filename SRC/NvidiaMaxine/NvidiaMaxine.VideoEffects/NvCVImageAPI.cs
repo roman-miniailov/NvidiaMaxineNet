@@ -94,7 +94,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvCVImage_Alloc(
-            NvCVImage im, 
+            ref NvCVImage im, 
             uint width, 
             uint height, 
             NvCVImagePixelFormat format,

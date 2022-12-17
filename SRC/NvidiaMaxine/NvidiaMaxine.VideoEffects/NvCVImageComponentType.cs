@@ -3,7 +3,7 @@
     /// <summary>
     /// The data type used to represent each component of an image.
     /// </summary>
-    public enum NvCVImageComponentType
+    public enum NvCVImageComponentType : int
     {
         /// <summary>
         /// Unknown type of component.

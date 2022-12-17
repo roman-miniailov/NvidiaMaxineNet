@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -209,7 +210,7 @@ namespace DenoiseEffectApp
 
             _effectName = effectSelector;
 
-            if (string.IsNullOrEmpty(modelDir))
+            if (!string.IsNullOrEmpty(modelDir))
             {
                 vfxErr = NvVFXAPI.NvVFX_SetString(_eff, NvVFXParameterSelectors.NVVFX_MODEL_DIRECTORY, modelDir);
                 CheckResult(vfxErr);
@@ -231,7 +232,7 @@ namespace DenoiseEffectApp
         NvCVStatus allocTempBuffers()
         {
             NvCVStatus vfxErr;
-            vfxErr = NvCVImageAPI.NvCVImage_Alloc(_tmpVFX, _dstVFX.Width, _dstVFX.Height, _dstVFX.PixelFormat, _dstVFX.ComponentType, _dstVFX.Planar, NvCVMemSpace.NVCV_GPU, 0);
+            vfxErr = NvCVImageAPI.NvCVImage_Alloc(ref _tmpVFX, _dstVFX.Width, _dstVFX.Height, _dstVFX.PixelFormat, _dstVFX.ComponentType, _dstVFX.Planar, NvCVMemSpace.NVCV_GPU, 0);
             CheckResult(vfxErr);
 
             vfxErr = NvCVImageAPI.NvCVImage_Realloc(_tmpVFX, _srcVFX.Width, _srcVFX.Height, _srcVFX.PixelFormat, _srcVFX.ComponentType, _srcVFX.Planar, NvCVMemSpace.NVCV_GPU, 0);
@@ -240,7 +241,7 @@ namespace DenoiseEffectApp
             return vfxErr;
         }
 
-        void NVWrapperForCVMat(Mat cvIm, NvCVImage nvcvIm)
+        void NVWrapperForCVMat(Mat cvIm, ref NvCVImage nvcvIm)
         {
             NvCVImagePixelFormat[] nvFormat = new[] { NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN, NvCVImagePixelFormat.NVCV_Y, NvCVImagePixelFormat.NVCV_YA, NvCVImagePixelFormat.NVCV_BGR, NvCVImagePixelFormat.NVCV_BGRA };
             NvCVImageComponentType[] nvType = new[] { NvCVImageComponentType.NVCV_U8, NvCVImageComponentType.NVCV_TYPE_UNKNOWN, NvCVImageComponentType.NVCV_U16, NvCVImageComponentType.NVCV_S16, NvCVImageComponentType.NVCV_S32,
@@ -253,8 +254,8 @@ namespace DenoiseEffectApp
             nvcvIm.PixelFormat = nvFormat[cvIm.Channels() <= 4 ? cvIm.Channels() : 0];
             nvcvIm.ComponentType = nvType[cvIm.Depth() & 7];
             nvcvIm.BufferBytes = 0;
-            nvcvIm.DeletePtr = null;
-            nvcvIm.DeleteProc = null;
+            //nvcvIm.DeletePtr = null;
+            //nvcvIm.DeleteProc = null;
             nvcvIm.PixelBytes = (byte)cvIm.Step(1);
             nvcvIm.ComponentBytes = (byte)cvIm.ElemSize1();
             nvcvIm.NumComponents = (byte)cvIm.Channels();
@@ -273,6 +274,7 @@ namespace DenoiseEffectApp
                 return NvCVStatus.NVCV_SUCCESS;
             }
 
+            _srcImg = new Mat();
             if (_srcImg.Data == IntPtr.Zero)
             {
                 // src CPU
@@ -281,23 +283,25 @@ namespace DenoiseEffectApp
                 if (_srcImg.Data == IntPtr.Zero)
                 {
                     return NvCVStatus.NVCV_ERR_MEMORY;
-                };
+                }
             }
 
+            _dstImg = new Mat();
             _dstImg.Create(_srcImg.Rows, _srcImg.Cols, _srcImg.Type());
             if (_dstImg.Data == IntPtr.Zero)
             {
                 return NvCVStatus.NVCV_ERR_MEMORY;
-            };
+            }
 
             // src GPU
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(_srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            _srcGpuBuf = new NvCVImage();
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             //dst GPU
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(_dstGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
-            NVWrapperForCVMat(_srcImg, _srcVFX);      // _srcVFX is an alias for _srcImg
-            NVWrapperForCVMat(_dstImg, _dstVFX);      // _dstVFX is an alias for _dstImg
+            NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
+            NVWrapperForCVMat(_dstImg, ref _dstVFX);      // _dstVFX is an alias for _dstImg
 
             //#define ALLOC_TEMP_BUFFERS_AT_RUN_TIME    // Deferring temp buffer allocation is easier
             //# ifndef ALLOC_TEMP_BUFFERS_AT_RUN_TIME      // Allocating temp buffers at load time avoids run time hiccups
@@ -336,8 +340,8 @@ namespace DenoiseEffectApp
 
             CheckResult(allocBuffers(_srcImg.Cols, _srcImg.Rows));
             CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, stream, _tmpVFX)); // _srcVFX--> _tmpVFX --> _srcGpuBuf
-            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, _srcGpuBuf));
-            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, _dstGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, ref _srcGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _dstGpuBuf));
             CheckResult(NvVFXAPI.NvVFX_SetF32(_eff, NvVFXParameterSelectors.NVVFX_STRENGTH, FLAG_strength));
 
             uint stateSizeInBytes;
@@ -345,7 +349,8 @@ namespace DenoiseEffectApp
             CUDA.Runtime.API.cudaMalloc(ref state, stateSizeInBytes);
             CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);
             stateArray[0] = state;
-            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
+            //CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
+            // BUG!!!
 
             CheckResult(NvVFXAPI.NvVFX_Load(_eff));
             CheckResult(NvVFXAPI.NvVFX_Run(_eff, 0));
@@ -391,8 +396,7 @@ namespace DenoiseEffectApp
             uint frameNum;
             VideoInfo info;
 
-            IntPtr state = IntPtr.Zero;
-            IntPtr[] stateArray = new IntPtr[1];
+            IntPtr state = IntPtr.Zero;            
 
             if (!context.Webcam && !string.IsNullOrEmpty(context.InFile))
             {
@@ -443,16 +447,23 @@ namespace DenoiseEffectApp
                 }
             }
 
-            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, _srcGpuBuf));
-            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, _dstGpuBuf));
+            
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, ref _srcGpuBuf));
+            CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _dstGpuBuf));
+
             CheckResult(NvVFXAPI.NvVFX_SetF32(_eff, NvVFXParameterSelectors.NVVFX_STRENGTH, context.Strength));
 
             uint stateSizeInBytes;
             CheckResult(NvVFXAPI.NvVFX_GetU32(_eff, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
             CUDA.Runtime.API.cudaMalloc(ref state, stateSizeInBytes);
             CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);
+
+            IntPtr[] stateArray = new IntPtr[1];
             stateArray[0] = state;
-            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
+            IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
+            Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
+                                              
+            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, buffer));
             CheckResult(NvVFXAPI.NvVFX_Load(_eff));
 
             for (frameNum = 0; reader.Read(_srcImg); frameNum++)

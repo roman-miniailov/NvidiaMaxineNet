@@ -10,7 +10,7 @@ namespace NvidiaMaxine.VideoEffects
     /// <summary>
     /// The format of pixels in an image.
     /// </summary>
-    public enum NvCVImagePixelFormat
+    public enum NvCVImagePixelFormat : int
     {
         /// <summary>
         /// Unknown pixel format.

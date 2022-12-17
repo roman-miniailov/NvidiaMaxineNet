@@ -134,7 +134,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetObject(IntPtr effect, string paramName, IntPtr[] ptr);
+        public static extern NvCVStatus NvVFX_SetObject(IntPtr effect, string paramName, IntPtr ptr);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -190,7 +190,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_SetImage(IntPtr effect, string paramName, NvCVImage im);
+        public static extern NvCVStatus NvVFX_SetImage(IntPtr effect, string paramName, ref NvCVImage im);
 
         /// <summary>
         /// Set the value of the selected string, by making a copy in the effect handle.
@@ -341,7 +341,7 @@ namespace NvidiaMaxine.VideoEffects
         /// NVCV_ERR_PARAMETER if the value was out of range.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_GetImage(IntPtr effect, string paramName, NvCVImage im);
+        public static extern NvCVStatus NvVFX_GetImage(IntPtr effect, string paramName, ref NvCVImage im);
 
         /// <summary>
         /// Get the specified string. If GetString() is called before SetString(), the returned string will be empty.
