@@ -1,16 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<Nullable>disable</Nullable>
-		<Langversion>10.0</Langversion>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<Platforms>AnyCPU;x64</Platforms>
+		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Folder Include="CUDA\" />
+		<ProjectReference Include="..\..\NvidiaMaxine.VideoEffects\NvidiaMaxine.VideoEffects.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="openh264-1.8.0-win64.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

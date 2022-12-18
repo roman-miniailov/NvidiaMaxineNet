@@ -274,11 +274,11 @@ namespace DenoiseEffectApp
             {
                 return NvCVStatus.NVCV_SUCCESS;
             }
-
-            _srcImg = new Mat();
-            if (_srcImg.Data == IntPtr.Zero)
+                        
+            if (_srcImg == null || _srcImg.Data == IntPtr.Zero)
             {
                 // src CPU
+                _srcImg = new Mat();
                 _srcImg.Create(height, width, MatType.CV_8UC3);
 
                 if (_srcImg.Data == IntPtr.Zero)
@@ -299,6 +299,7 @@ namespace DenoiseEffectApp
             CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             //dst GPU
+            _dstGpuBuf = new NvCVImage();
             CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
@@ -326,11 +327,15 @@ namespace DenoiseEffectApp
             NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
 
             IntPtr state = IntPtr.Zero;
-            IntPtr[] stateArray = new IntPtr[1];
 
             if (_eff == IntPtr.Zero)
             {
                 return Err.errEffect;
+            }
+
+            if (!File.Exists(inFile))
+            {
+                return Err.errFileNotFound;
             }
 
             _srcImg = OpenCvSharp.Cv2.ImRead(inFile);
@@ -349,9 +354,12 @@ namespace DenoiseEffectApp
             CheckResult(NvVFXAPI.NvVFX_GetU32(_eff, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
             CUDA.Runtime.API.cudaMalloc(ref state, stateSizeInBytes);
             CUDA.Runtime.API.cudaMemsetAsync(state, 0, stateSizeInBytes, stream);
+            
+            IntPtr[] stateArray = new IntPtr[1];
             stateArray[0] = state;
-            //CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, stateArray));
-            // BUG!!!
+            IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
+            Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
+            CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, buffer));
 
             CheckResult(NvVFXAPI.NvVFX_Load(_eff));
             CheckResult(NvVFXAPI.NvVFX_Run(_eff, 0));
@@ -363,7 +371,7 @@ namespace DenoiseEffectApp
                 {
                     Console.WriteLine("WARNING: JPEG output file format will reduce image quality\n");
                 }
-
+               
                 if (!Cv2.ImWrite(outFile, _dstImg))
                 {
                     Console.WriteLine("Error writing: \"%s\"\n", outFile);
@@ -429,7 +437,7 @@ namespace DenoiseEffectApp
                 return Err.errRead;
             }
 
-            Helpers.GetVideoInfo(reader, (!string.IsNullOrEmpty(context.InFile) ? context.InFile : "webcam"), context.Verbose, out info);
+            Helpers.GetVideoInfo(reader, context.Verbose, out info);
             if (!(fourcc_h264 == info.Codec || VideoWriter.FourCC('a', 'v', 'c', '1') == info.Codec)) // avc1 is alias for h264
             {
                 Console.WriteLine("Filters only target H264 videos, not %.4s\n", info.Codec);
@@ -442,7 +450,7 @@ namespace DenoiseEffectApp
                 ok = writer.Open(context.OutFile, VideoWriter.FourCC(context.Codec), info.FrameRate, new Size(_dstVFX.Width, _dstVFX.Height));
                 if (!ok)
                 {
-                    Console.WriteLine("Cannot open \"%s\" for video writing\n", context.OutFile);
+                    Console.WriteLine($"Cannot open {context.OutFile} for video writing.");
                     context.OutFile = null;
                     if (!_show)
                     {
@@ -450,8 +458,6 @@ namespace DenoiseEffectApp
                     }
                 }
             }
-
-            //mxtest(_eff, ref _srcGpuBuf, ref _dstGpuBuf, context.Strength, stream, out var stateSizeInBytes);
 
             CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, ref _srcGpuBuf));
             CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _dstGpuBuf));
@@ -467,8 +473,8 @@ namespace DenoiseEffectApp
             stateArray[0] = state;
             IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
             Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
-
             CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, buffer));
+
             CheckResult(NvVFXAPI.NvVFX_Load(_eff));
 
             for (frameNum = 0; reader.Read(_srcImg); frameNum++)

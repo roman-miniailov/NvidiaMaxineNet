@@ -9,8 +9,9 @@ namespace NvidiaMaxine.VideoEffects
 {
     public static class Helpers
     {
-        public static void GetVideoInfo(VideoCapture reader, string fileName, bool verbose, out VideoInfo info)
+        public static void GetVideoInfo(VideoCapture reader, bool verbose, out VideoInfo info)
         {
+            info = new VideoInfo();
             info.Codec = (int)reader.Get(VideoCaptureProperties.FourCC);
             info.Width = (int)reader.Get(VideoCaptureProperties.FrameWidth);
             info.Height = (int)reader.Get(VideoCaptureProperties.FrameHeight);
@@ -19,17 +20,14 @@ namespace NvidiaMaxine.VideoEffects
 
             if (verbose)
             {
+                var dur = DurationString(info.FrameCount / info.FrameRate);
                 Console.WriteLine(
-                  "       file \"%s\"\n" +
-                  "      codec %.4s\n" +
-                  "      width %4d\n" +
-                  "     height %4d\n" +
-                  " frame rate %.3f\n" +
-                  "frame count %4lld\n" +
-                  "   duration %s\n",
-                  fileName, info.Codec, info.Width, info.Height, info.FrameRate, info.FrameCount,
-                  DurationString(info.FrameCount / info.FrameRate)
-                );
+                  $"      codec {info.Codec}\n" +
+                  $"      width {info.Width}\n" +
+                  $"     height {info.Height}\n" +
+                  $" frame rate {info.FrameRate:F3}\n" +
+                  $"frame count {info.FrameCount}\n" +
+                  $"   duration {dur}\n");
             }
         }
 
@@ -41,7 +39,7 @@ namespace NvidiaMaxine.VideoEffects
             sc -= hr * 3600.0;
             mn = (int)(sc / 60.0);
             sc -= mn * 60.0;
-            buf = string.Format("%02d:%02d:%06.3f", hr, mn, sc);
+            buf = $"{hr:D2}:{mn:D2}:{sc:F3}";
             return buf;
         }
 

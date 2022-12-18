@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DenoiseEffectApp", "VFXSamp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NvidiaMaxine.VideoEffects.Bridge", "NvidiaMaxine.VideoEffects.Bridge\NvidiaMaxine.VideoEffects.Bridge.vcxproj", "{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainDemo", "VFXSamples\MainDemo\MainDemo.csproj", "{A7F54079-FE02-4219-9004-38270776B850}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,12 +62,25 @@ Global
 		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x64.Build.0 = Release|x64
 		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x86.ActiveCfg = Release|Win32
 		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x86.Build.0 = Release|Win32
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Debug|x86.Build.0 = Debug|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|x64.Build.0 = Release|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|x86.ActiveCfg = Release|Any CPU
+		{A7F54079-FE02-4219-9004-38270776B850}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1888F484-3809-411E-BC43-A472C31AB3EB} = {8DE390F5-D560-44AB-9208-C3DBE40F6D4D}
+		{A7F54079-FE02-4219-9004-38270776B850} = {8DE390F5-D560-44AB-9208-C3DBE40F6D4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {743B13BA-4D24-417E-9AC5-F07B7C6AEC67}
