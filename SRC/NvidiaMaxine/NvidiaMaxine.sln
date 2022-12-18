@@ -8,6 +8,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8DE390F5-D560-44AB-9208-C3DBE40F6D4D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DenoiseEffectApp", "VFXSamples\DenoiseEffectApp\DenoiseEffectApp.csproj", "{1888F484-3809-411E-BC43-A472C31AB3EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E} = {8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NvidiaMaxine.VideoEffects.Bridge", "NvidiaMaxine.VideoEffects.Bridge\NvidiaMaxine.VideoEffects.Bridge.vcxproj", "{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}"
 EndProject
@@ -21,10 +24,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x64.Build.0 = Debug|Any CPU
+		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|Any CPU.Build.0 = Debug|x64
+		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x64.ActiveCfg = Debug|x64
+		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x64.Build.0 = Debug|x64
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Debug|x86.Build.0 = Debug|Any CPU
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,10 +36,10 @@ Global
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Release|x64.Build.0 = Release|Any CPU
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Release|x86.ActiveCfg = Release|Any CPU
 		{B9A5CD40-4843-4174-8AC8-F73BE5ABDB4B}.Release|x86.Build.0 = Release|Any CPU
-		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x64.Build.0 = Debug|Any CPU
+		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|Any CPU.Build.0 = Debug|x64
+		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x64.ActiveCfg = Debug|x64
+		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x64.Build.0 = Debug|x64
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Debug|x86.Build.0 = Debug|Any CPU
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU

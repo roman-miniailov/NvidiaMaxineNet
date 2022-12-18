@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DenoiseEffectApp": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

@@ -24,8 +24,9 @@ namespace DenoiseEffectApp
             //    std::cerr << nErrs << " command line syntax problems\n";
 
             Context = new Context();
-            Context.InFile = @"C:\samples\!video.mp4";
+            Context.InFile = @"C:\samples\!video.avi";
             Context.OutFile = @"C:\vf\out.mp4";
+            Context.ModelDir = @"c:\Projects\_Projects\NvidiaMaxine\SDK\bin\models\";
 
             if (Context.Webcam)
             {

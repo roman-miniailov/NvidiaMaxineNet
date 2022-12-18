@@ -10,6 +10,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DenoiseEffectApp
 {
@@ -39,7 +40,7 @@ namespace DenoiseEffectApp
             _effectName = null;
             _inited = false;
             _showFPS = false;
-            _progress = false;
+            _progress = true;
             _show = false;
             _enableEffect = true;
             _drawVisualization = true;
@@ -384,6 +385,9 @@ namespace DenoiseEffectApp
             return appErrFromVfxStatus(vfxErr);
         }
 
+        //[DllImport("NvidiaMaxine.VideoEffects.Bridge.dll", CallingConvention = CallingConvention.Cdecl)]
+        //private static extern int mxtest(IntPtr eff, ref NvCVImage srcGpuBuf, ref NvCVImage dstGpuBuf, float strength, IntPtr stream, out int sizeInBytes);
+
         public Err processMovie(Context context)
         {
             int fourcc_h264 = VideoWriter.FourCC('H', '2', '6', '4');
@@ -447,7 +451,8 @@ namespace DenoiseEffectApp
                 }
             }
 
-            
+            //mxtest(_eff, ref _srcGpuBuf, ref _dstGpuBuf, context.Strength, stream, out var stateSizeInBytes);
+
             CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, ref _srcGpuBuf));
             CheckResult(NvVFXAPI.NvVFX_SetImage(_eff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _dstGpuBuf));
 
@@ -462,7 +467,7 @@ namespace DenoiseEffectApp
             stateArray[0] = state;
             IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
             Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
-                                              
+
             CheckResult(NvVFXAPI.NvVFX_SetObject(_eff, NvVFXParameterSelectors.NVVFX_STATE, buffer));
             CheckResult(NvVFXAPI.NvVFX_Load(_eff));
 
@@ -500,7 +505,8 @@ namespace DenoiseEffectApp
                 }
                 if (_progress)
                 {
-                    Console.WriteLine("\b\b\b\b%3.0f%%", 100.0f * frameNum / info.FrameCount);
+                    var progress = 100.0f * frameNum / info.FrameCount;
+                    Console.WriteLine($"Progress: {progress:F2}%");
                 }
             }
 

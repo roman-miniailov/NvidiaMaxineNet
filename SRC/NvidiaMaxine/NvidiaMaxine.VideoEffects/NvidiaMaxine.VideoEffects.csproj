@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<Langversion>10.0</Langversion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>

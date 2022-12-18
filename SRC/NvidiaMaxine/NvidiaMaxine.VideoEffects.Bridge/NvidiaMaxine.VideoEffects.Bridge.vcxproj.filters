@@ -18,7 +18,22 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="nvCVImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nvCVStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nvTransferD3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nvTransferD3D11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nvVideoEffects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MXAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,8 +41,19 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="nvCVImageProxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nvVideoEffectsProxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MXAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MXAPI.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace DenoiseEffectApp
         public bool Debug = false;
         public bool Verbose = false;
         public bool Show = false;
-        public bool Progress = false;
+        public bool Progress = true;
         public bool Webcam = false;
         public float Strength = 0.0f;
         public string Codec = DEFAULT_CODEC;
