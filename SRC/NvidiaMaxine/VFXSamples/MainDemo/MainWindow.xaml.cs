@@ -1,4 +1,5 @@
 ﻿using NvidiaMaxine.VideoEffects;
+using NvidiaMaxine.VideoEffects.Effects;
 using NvidiaMaxine.VideoEffects.Outputs;
 using NvidiaMaxine.VideoEffects.Sources;
 using System;
@@ -29,7 +30,11 @@ namespace MainDemo
 
         private FileOutput _output;
 
+        private DenoiseEffect _denoiseEffect;
+
         private ulong _frameID;
+
+        private string MODELS_DIR = @"c:\Projects\_Projects\NvidiaMaxine\SDK\bin\models\";
 
         public MainWindow()
         {
@@ -40,6 +45,7 @@ namespace MainDemo
         {
             _frameID = 0;
 
+            // add source
             VideoInfo info = new VideoInfo();
             if (rbFile.IsChecked == true)
             {
@@ -56,9 +62,15 @@ namespace MainDemo
                 _source.GetVideoInfo(out info);
             }
 
+            // add output
             _output = new FileOutput();
             _output.Init(edOutputFilename.Text, info.Resolution, info.FrameRate);
 
+            // add effect
+            _denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
+            _denoiseEffect.Init(info.Width, info.Height);
+
+            // start
             _source.Start();
         }
 
@@ -66,7 +78,10 @@ namespace MainDemo
         {
             Debug.WriteLine("Frame received.");
 
-            _output.WriteFrame(e.Frame);
+            var processedFrame = _denoiseEffect.Process();
+            _output.WriteFrame(processedFrame);
+
+            //_output.WriteFrame(e.Frame);
 
             _frameID++;
         }
@@ -80,6 +95,9 @@ namespace MainDemo
             _output?.Finish();
             _output?.Dispose();
             _output = null;
+
+            _denoiseEffect?.Dispose();
+            _denoiseEffect = null;
         }
     }
 }

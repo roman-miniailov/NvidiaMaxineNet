@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.InteropServices;
 
-namespace NvidiaMaxine.VideoEffects
+namespace NvidiaMaxine.VideoEffects.API
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct NvCVImage
@@ -205,7 +205,8 @@ namespace NvidiaMaxine.VideoEffects
         /// </summary>
         public void Destroy()
         {
-            NvCVImageAPI.NvCVImage_Dealloc(this);
+            NvCVImageAPI.NvCVImage_Dealloc(ref this);
+            //NvCVImageAPI.NvCVImage_Destroy(ref this);
         }
     };
 }

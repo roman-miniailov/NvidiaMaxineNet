@@ -1,6 +1,7 @@
 ﻿using CUDA;
 using DenoiseEffectApp;
 using NvidiaMaxine.VideoEffects;
+using NvidiaMaxine.VideoEffects.API;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -220,7 +221,7 @@ namespace DenoiseEffectApp
             return appErrFromVfxStatus(vfxErr);
         }
 
-        void destroyEffect()
+        public void destroyEffect()
         {
             NvVFXAPI.NvVFX_DestroyEffect(_eff);
             //_eff = null;

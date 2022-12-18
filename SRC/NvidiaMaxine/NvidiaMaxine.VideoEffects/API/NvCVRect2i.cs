@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.VideoEffects
+namespace NvidiaMaxine.VideoEffects.API
 {
     /// <summary>
     /// Integer rectangle.

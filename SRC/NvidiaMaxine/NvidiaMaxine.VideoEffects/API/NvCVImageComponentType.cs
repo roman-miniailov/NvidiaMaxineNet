@@ -1,4 +1,4 @@
-﻿namespace NvidiaMaxine.VideoEffects
+﻿namespace NvidiaMaxine.VideoEffects.API
 {
     /// <summary>
     /// The data type used to represent each component of an image.

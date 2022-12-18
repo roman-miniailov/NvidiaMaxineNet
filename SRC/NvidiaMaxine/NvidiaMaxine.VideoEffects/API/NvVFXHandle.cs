@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace NvidiaMaxine.VideoEffects
+namespace NvidiaMaxine.VideoEffects.API
 {
     //public struct NvVFXHandle : IntPtr
     //{

@@ -16,5 +16,7 @@ namespace NvidiaMaxine.VideoEffects.Sources
         public void Stop();
 
         public void GetVideoInfo(out VideoInfo info);
+
+        public Mat GetBaseFrame();
     }
 }

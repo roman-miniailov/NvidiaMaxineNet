@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.VideoEffects
+namespace NvidiaMaxine.VideoEffects.API
 {
     public static class NvVFXAPI
     {
@@ -87,7 +87,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetF32(IntPtr effect, string paramName, float val);
-        
+
         /// <summary>
         /// Set the value of the selected parameter.
         /// </summary>
@@ -151,7 +151,7 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetStateObjectHandleArray(
-            IntPtr effect, 
+            IntPtr effect,
             string paramName,
             /* NvVFX_StateObjectHandle* */ object handle);
 
@@ -170,8 +170,8 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetCudaStream(
-            IntPtr effect, 
-            string paramName, 
+            IntPtr effect,
+            string paramName,
             /*CUstream*/ object stream);
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace NvidiaMaxine.VideoEffects
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_SetString(
             IntPtr effect,
-            [MarshalAs(UnmanagedType.LPStr)] string paramName, 
+            [MarshalAs(UnmanagedType.LPStr)] string paramName,
             [MarshalAs(UnmanagedType.LPStr)] string str);
 
         /// <summary>
@@ -360,8 +360,8 @@ namespace NvidiaMaxine.VideoEffects
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_GetString(
-            IntPtr effect, 
-            string paramName, 
+            IntPtr effect,
+            string paramName,
             out string str);
 
         /// <summary>
@@ -452,6 +452,6 @@ namespace NvidiaMaxine.VideoEffects
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
         public static extern NvCVStatus NvVFX_ResetState(IntPtr effect, NvVFXStateObjectHandle handle);
 
-        
+
     }
 }

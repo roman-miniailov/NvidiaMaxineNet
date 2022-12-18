@@ -1,4 +1,4 @@
-﻿namespace NvidiaMaxine.VideoEffects
+﻿namespace NvidiaMaxine.VideoEffects.API
 {
     /// <summary>
     /// MemSpace.

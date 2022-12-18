@@ -1,4 +1,5 @@
 ﻿using NvidiaMaxine.VideoEffects;
+using NvidiaMaxine.VideoEffects.API;
 using OpenCvSharp;
 using System;
 using System.Diagnostics;
@@ -24,10 +25,11 @@ namespace DenoiseEffectApp
             //    std::cerr << nErrs << " command line syntax problems\n";
 
             Context = new Context();
-            Context.InFile = @"C:\vf\x\YDXJ0110-3t.mp4";
-            //Context.InFile = @"C:\vf\x\!video.avi";
-            Context.OutFile = @"C:\vf\x\YDXJ0110-3t-nv.mp4";
-            
+            // Context.InFile = @"C:\vf\x\YDXJ0110-3t.mp4";
+            Context.InFile = @"C:\vf\x\!video.avi";
+            //Context.OutFile = @"C:\vf\x\YDXJ0110-3t-nv.mp4";
+            Context.OutFile = @"C:\vf\x\outxx.mp4";
+
             //Context.InFile = @"c:\VF\x\O1.bmp";
             //Context.OutFile = @"c:\VF\x\O1nv.png";
 
@@ -46,13 +48,13 @@ namespace DenoiseEffectApp
                     Context.Show = !Context.Show;
                 }
             }
-            
+
             if (string.IsNullOrEmpty(Context.InFile) && !Context.Webcam)
             {
                 Console.WriteLine("Please specify --in_file=XXX or --webcam=true");
                 ++nErrs;
             }
-            
+
             if (string.IsNullOrEmpty(Context.OutFile) && !Context.Show)
             {
                 Console.WriteLine("Please specify --out_file=XXX or --show");
@@ -83,10 +85,14 @@ namespace DenoiseEffectApp
                 }
             }
 
+            app.destroyEffect();
+
             if (fxErr > 0)
             {
                 Console.WriteLine("Error: " + app.errorStringFromCode(fxErr));
             }
+
+            Console.ReadKey();
         }
         static void Usage()
         {

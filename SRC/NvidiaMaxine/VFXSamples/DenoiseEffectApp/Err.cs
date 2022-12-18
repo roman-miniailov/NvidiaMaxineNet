@@ -1,4 +1,4 @@
-﻿using NvidiaMaxine.VideoEffects;
+﻿using NvidiaMaxine.VideoEffects.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
