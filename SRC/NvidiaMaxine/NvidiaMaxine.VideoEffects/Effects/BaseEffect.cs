@@ -3,6 +3,7 @@ using NvidiaMaxine.VideoEffects.API;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -20,23 +21,25 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         protected IntPtr _handle;
 
-        private IntPtr _state;
+        protected IntPtr _state;
 
-        private IntPtr _stream;
+        protected IntPtr _stream;
 
         private bool disposedValue;
 
-        private Mat _srcImg;
+        protected Mat _srcImg;
 
-        private Mat _dstImg;
+        protected Mat _dstImg;
 
-        private NvCVImage _srcGpuBuf;
+        protected NvCVImage _srcGpuBuf;
 
-        private NvCVImage _dstGpuBuf;
+        protected NvCVImage _dstGpuBuf;
 
-        private NvCVImage _srcVFX;
+        protected NvCVImage _srcVFX;
 
-        private NvCVImage _dstVFX;
+        protected NvCVImage _dstVFX;
+
+        protected bool _useState = false;
 
         /// <summary>
         /// We use the same temporary buffer for source and dst, since it auto-shapes as needed.
@@ -106,7 +109,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
             _dstGpuBuf.Destroy();
         }
 
-        private void NVWrapperForCVMat(Mat cvIm, ref NvCVImage nvcvIm)
+        protected static void NVWrapperForCVMat(Mat cvIm, ref NvCVImage nvcvIm)
         {
             NvCVImagePixelFormat[] nvFormat = new[] { NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN, NvCVImagePixelFormat.NVCV_Y, NvCVImagePixelFormat.NVCV_YA, NvCVImagePixelFormat.NVCV_BGR, NvCVImagePixelFormat.NVCV_BGRA };
             NvCVImageComponentType[] nvType = new[] { NvCVImageComponentType.NVCV_U8, NvCVImageComponentType.NVCV_TYPE_UNKNOWN, NvCVImageComponentType.NVCV_U16, NvCVImageComponentType.NVCV_S16, NvCVImageComponentType.NVCV_S32,
@@ -134,7 +137,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         // and is very low overhead. We expect the destination to be largest, so we allocate that first to minimize reallocs probablistically.
         // Then we Realloc for the source to get the union of the two.
         // This could alternately be done at runtime by feeding in an empty temp NvCVImage, but there are advantages to allocating all memory at load time.
-        private NvCVStatus allocTempBuffers()
+        protected virtual NvCVStatus AllocTempBuffers()
         {
             NvCVStatus vfxErr;
             vfxErr = NvCVImageAPI.NvCVImage_Alloc(ref _tmpVFX, _dstVFX.Width, _dstVFX.Height, _dstVFX.PixelFormat, _dstVFX.ComponentType, _dstVFX.Planar, NvCVMemSpace.NVCV_GPU, 0);
@@ -155,30 +158,43 @@ namespace NvidiaMaxine.VideoEffects.Effects
             _state = IntPtr.Zero;
             _stream = IntPtr.Zero;
 
-            CheckResult(allocBuffers(width, height));
+            CheckResult(AllocBuffers(width, height));
 
             CheckResult(NvVFXAPI.NvVFX_SetImage(_handle, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE, ref _srcGpuBuf));
             CheckResult(NvVFXAPI.NvVFX_SetImage(_handle, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _dstGpuBuf));
 
             ApplyEffect();
 
-            uint stateSizeInBytes;
-            CheckResult(NvVFXAPI.NvVFX_GetU32(_handle, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
-            CUDA.Runtime.API.cudaMalloc(ref _state, stateSizeInBytes);
-            CUDA.Runtime.API.cudaMemsetAsync(_state, 0, stateSizeInBytes, _stream); // <- stream BUG?
+            if (_useState)
+            {
+                uint stateSizeInBytes;
+                CheckResult(NvVFXAPI.NvVFX_GetU32(_handle, NvVFXParameterSelectors.NVVFX_STATE_SIZE, out stateSizeInBytes));
+                CUDA.Runtime.API.cudaMalloc(ref _state, stateSizeInBytes);
+                CUDA.Runtime.API.cudaMemsetAsync(_state, 0, stateSizeInBytes, _stream); // <- stream BUG?
 
-            IntPtr[] stateArray = new IntPtr[1];
-            stateArray[0] = _state;
-            IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
-            Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
-            CheckResult(NvVFXAPI.NvVFX_SetObject(_handle, NvVFXParameterSelectors.NVVFX_STATE, buffer));
+                IntPtr[] stateArray = new IntPtr[1];
+                stateArray[0] = _state;
+                IntPtr buffer = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)) * stateArray.Length);
+                Marshal.Copy(stateArray, 0, buffer, stateArray.Length);
+                CheckResult(NvVFXAPI.NvVFX_SetObject(_handle, NvVFXParameterSelectors.NVVFX_STATE, buffer));
+            }    
+            else
+            {
+                //_stream = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(IntPtr)));
+                //Marshal.WriteIntPtr(_stream, IntPtr.Zero);
+
+                //CheckResult(NvVFXAPI.NvVFX_CudaStreamCreate(out _stream));
+                CheckResult(NvVFXAPI.NvVFX_SetCudaStream(_handle, NvVFXParameterSelectors.NVVFX_CUDA_STREAM, _stream));
+
+                //var res = Marshal.ReadIntPtr(_stream);
+            }
 
             CheckResult(NvVFXAPI.NvVFX_Load(_handle));
 
             return NvCVStatus.NVCV_SUCCESS;
         }
 
-        private NvCVStatus allocBuffers(int width, int height)
+        protected virtual NvCVStatus AllocBuffers(int width, int height)
         {
             NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
 
@@ -207,12 +223,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             //dst GPU
             _dstGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Cols, (uint)_dstImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
             NVWrapperForCVMat(_dstImg, ref _dstVFX);      // _dstVFX is an alias for _dstImg
 
-            CheckResult(allocTempBuffers());
+            CheckResult(AllocTempBuffers());
 
             return vfxErr;
         }

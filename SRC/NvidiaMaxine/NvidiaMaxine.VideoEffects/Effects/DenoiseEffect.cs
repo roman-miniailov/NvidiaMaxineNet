@@ -15,7 +15,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         public DenoiseEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
         {
-            
+            _useState = true;
         }
 
         protected override void ApplyEffect()

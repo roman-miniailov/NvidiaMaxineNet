@@ -32,6 +32,10 @@ namespace MainDemo
 
         private DenoiseEffect _denoiseEffect;
 
+        private ArtifactReductionEffect _artifactReductionEffect;
+
+        private SuperResolutionEffect _superResolutionEffect;
+
         private ulong _frameID;
 
         private string MODELS_DIR = @"c:\Projects\_Projects\NvidiaMaxine\SDK\bin\models\";
@@ -67,8 +71,13 @@ namespace MainDemo
             _output.Init(edOutputFilename.Text, info.Resolution, info.FrameRate);
 
             // add effect
-            _denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
-            _denoiseEffect.Init(info.Width, info.Height);
+            //_denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
+            //_denoiseEffect.Init(info.Width, info.Height);
+            //_artifactReductionEffect = new ArtifactReductionEffect(MODELS_DIR, _source.GetBaseFrame());
+            //_artifactReductionEffect.Init(info.Width, info.Height);
+
+            _superResolutionEffect = new SuperResolutionEffect(MODELS_DIR, _source.GetBaseFrame());
+            _superResolutionEffect.Init(info.Width, info.Height);
 
             // start
             _source.Start();
@@ -78,7 +87,9 @@ namespace MainDemo
         {
             Debug.WriteLine("Frame received.");
 
-            var processedFrame = _denoiseEffect.Process();
+            //var processedFrame = _denoiseEffect.Process();
+            //var processedFrame = _artifactReductionEffect.Process();
+            var processedFrame = _superResolutionEffect.Process();
             _output.WriteFrame(processedFrame);
 
             //_output.WriteFrame(e.Frame);
@@ -98,6 +109,12 @@ namespace MainDemo
 
             _denoiseEffect?.Dispose();
             _denoiseEffect = null;
+
+            _artifactReductionEffect?.Dispose();
+            _artifactReductionEffect = null;
+
+            _superResolutionEffect?.Dispose();
+            _superResolutionEffect = null;
         }
     }
 }

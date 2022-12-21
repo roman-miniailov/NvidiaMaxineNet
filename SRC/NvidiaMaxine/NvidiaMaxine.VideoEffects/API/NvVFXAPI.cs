@@ -172,7 +172,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public static extern NvCVStatus NvVFX_SetCudaStream(
             IntPtr effect,
             string paramName,
-            /*CUstream*/ object stream);
+            /*CUstream*/ IntPtr stream);
 
         /// <summary>
         /// Set the selected image descriptor. A shallow copy of the descriptor is made (preserving the pixel pointer), so that an ephemeral NvVFXImage_Init()
@@ -399,7 +399,7 @@ namespace NvidiaMaxine.VideoEffects.API
         /// NVCV_ERR_CUDA_VALUE if not.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_CudaStreamCreate(/*CUstream*/ object stream);
+        public static extern NvCVStatus NvVFX_CudaStreamCreate(/*CUstream*/ out IntPtr stream);
 
         /// <summary>
         /// Wrapper for cudaStreamDestroy(), if it is desired to avoid linking with the cuda lib.
