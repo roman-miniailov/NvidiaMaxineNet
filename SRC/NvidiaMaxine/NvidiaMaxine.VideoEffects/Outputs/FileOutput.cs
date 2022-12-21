@@ -1,9 +1,11 @@
 ﻿using CUDA;
 using OpenCvSharp;
+using OpenCvSharp.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +16,17 @@ namespace NvidiaMaxine.VideoEffects.Outputs
         private VideoWriter _writer = new VideoWriter();
 
         private bool disposedValue;
+
+        public FileOutput()
+        {
+            NativeMethods.ErrorHandlerDefault = ErrorHandler;
+        }
+
+        private int ErrorHandler(ErrorCode status, string funcName, string errMsg, string fileName, int line, IntPtr userData)
+        {
+            Debug.WriteLine($"OpenCV Error: {errMsg} in {funcName} at {fileName}:{line}");
+            return 0;
+        }
 
         public bool Init(string filename, Size resolution, double frameRate)
         {

@@ -23,6 +23,8 @@ namespace NvidiaMaxine.VideoEffects.Sources
 
         public event EventHandler<VideoFrameEventArgs> FrameReady;
 
+        public event EventHandler<EventArgs> Complete;
+
         public NvCVStatus Open(string filename)
         {
             _reader = new VideoCapture();
@@ -69,8 +71,10 @@ namespace NvidiaMaxine.VideoEffects.Sources
 
                     FrameReady?.Invoke(this, new VideoFrameEventArgs(_frame));
                 }
-
+                
                 _isRunning = false;
+                
+                Complete?.Invoke(this, new EventArgs());                
             });            
         }
 

@@ -38,7 +38,11 @@ namespace MainDemo
 
         private ulong _frameID;
 
-        private string MODELS_DIR = @"c:\Projects\_Projects\NvidiaMaxine\SDK\bin\models\";
+        private ulong _totalFrames;
+
+        private int _lastProgress;
+
+        private string MODELS_DIR = @"c:\Projects\_Projects\NvidiaMaxineNet\SDK\bin\models\";
 
         public MainWindow()
         {
@@ -48,6 +52,7 @@ namespace MainDemo
         private void btStart_Click(object sender, RoutedEventArgs e)
         {
             _frameID = 0;
+            _lastProgress = 0;
 
             // add source
             VideoInfo info = new VideoInfo();
@@ -62,8 +67,10 @@ namespace MainDemo
                 _source = new FileVideoSource();
                 (_source as FileVideoSource).Open(edSourceFilename.Text);
                 _source.FrameReady += Source_FrameReady;
+                _source.Complete += Source_Complete;
 
                 _source.GetVideoInfo(out info);
+                _totalFrames = (ulong)info.FrameCount;
             }
 
             // add output
@@ -71,33 +78,47 @@ namespace MainDemo
             _output.Init(edOutputFilename.Text, info.Resolution, info.FrameRate);
 
             // add effect
-            //_denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
-            //_denoiseEffect.Init(info.Width, info.Height);
+            _denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
+            _denoiseEffect.Init(info.Width, info.Height);
             //_artifactReductionEffect = new ArtifactReductionEffect(MODELS_DIR, _source.GetBaseFrame());
             //_artifactReductionEffect.Init(info.Width, info.Height);
 
-            _superResolutionEffect = new SuperResolutionEffect(MODELS_DIR, _source.GetBaseFrame());
-            _superResolutionEffect.Init(info.Width, info.Height);
+           // _superResolutionEffect = new SuperResolutionEffect(MODELS_DIR, _source.GetBaseFrame());
+           // _superResolutionEffect.Init(info.Width, info.Height);
 
             // start
             _source.Start();
         }
 
+        private void Source_Complete(object sender, EventArgs e)
+        {
+            StopAll();
+
+            MessageBox.Show("Done.");
+        }
+
         private void Source_FrameReady(object sender, VideoFrameEventArgs e)
         {
-            Debug.WriteLine("Frame received.");
+            //Debug.WriteLine("Frame received.");
 
-            //var processedFrame = _denoiseEffect.Process();
+            var processedFrame = _denoiseEffect.Process();
             //var processedFrame = _artifactReductionEffect.Process();
-            var processedFrame = _superResolutionEffect.Process();
+            //var processedFrame = _superResolutionEffect.Process();
             _output.WriteFrame(processedFrame);
+
+            var progress = (int)((_frameID * 100) / _totalFrames);
+            if (progress != _lastProgress)
+            {
+                _lastProgress = progress;
+                Debug.WriteLine($"Progress: {_lastProgress}%");
+            }
 
             //_output.WriteFrame(e.Frame);
 
             _frameID++;
         }
 
-        private void btStop_Click(object sender, RoutedEventArgs e)
+        private void StopAll()
         {
             _source?.Stop();
             _source?.Dispose();
@@ -115,6 +136,11 @@ namespace MainDemo
 
             _superResolutionEffect?.Dispose();
             _superResolutionEffect = null;
+        }
+
+        private void btStop_Click(object sender, RoutedEventArgs e)
+        {
+            StopAll();
         }
     }
 }

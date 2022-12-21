@@ -11,6 +11,8 @@ namespace NvidiaMaxine.VideoEffects.Sources
     {
         public event EventHandler<VideoFrameEventArgs> FrameReady;
 
+        public event EventHandler<EventArgs> Complete;
+
         public void Start();
 
         public void Stop();
