@@ -8,6 +8,10 @@ Currently Windows only.
 
 [NuGet package](https://www.nuget.org/packages/NvidiaMaxine.VideoEffects/)
 
+[CUDA Runtime 12](https://developer.nvidia.com/cuda-downloads) and [Video Effects SDK](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/maxine/collections/maxine) are required.
+
+Be sure that Video Effects SDK bin folder included in PATH environment variable.
+
 ## Used 3rd-party packages
 
 - [CUDA API](https://github.com/hikipuro/CUDAnshita)
