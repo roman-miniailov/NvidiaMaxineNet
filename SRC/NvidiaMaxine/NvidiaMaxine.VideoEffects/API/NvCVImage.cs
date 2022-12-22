@@ -1,8 +1,25 @@
-﻿using System.IO;
+﻿// ***********************************************************************
+// Assembly         : NvidiaMaxine.VideoEffects
+// Author           : Roman Miniailov
+// Created          : 12-19-2022
+//
+// Last Modified By : Roman Miniailov
+// Last Modified On : 12-22-2022
+// ***********************************************************************
+// <copyright file="NvCVImage.cs" company="Roman Miniailov">
+//     2022-2023
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace NvidiaMaxine.VideoEffects.API
 {
+    /// <summary>
+    /// NvCVImage
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct NvCVImage
     {
@@ -32,7 +49,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public NvCVImageComponentType ComponentType = NvCVImageComponentType.NVCV_TYPE_UNKNOWN;
 
         /// <summary>
-        ///  The number of bytes in a chunky pixel.
+        /// The number of bytes in a chunky pixel.
         /// </summary>
         public byte PixelBytes = 0;
 
@@ -82,7 +99,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public IntPtr DeletePtr = IntPtr.Zero;
 
         /// <summary>
-        ///  Delete procedure to call rather than free().
+        /// Delete procedure to call rather than free().
         /// </summary>
         public IntPtr DeleteProc = IntPtr.Zero; // (* deleteProc) (void* p);
 
@@ -92,7 +109,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public ulong BufferBytes = 0;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NvCVImage"/> struct.
+        /// Initializes a new instance of the <see cref="NvCVImage" /> struct.
         /// </summary>
         public NvCVImage()
         {
@@ -119,7 +136,7 @@ namespace NvidiaMaxine.VideoEffects.API
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NvCVImage"/> struct.
+        /// Initializes a new instance of the <see cref="NvCVImage" /> struct.
         /// </summary>
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
@@ -141,7 +158,7 @@ namespace NvidiaMaxine.VideoEffects.API
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NvCVImage"/> struct.
+        /// Initializes a new instance of the <see cref="NvCVImage" /> struct.
         /// </summary>
         /// <param name="fullImg">The full img.</param>
         /// <param name="x">The x.</param>
@@ -159,10 +176,10 @@ namespace NvidiaMaxine.VideoEffects.API
         /// <param name="src">The source.</param>
         /// <param name="srcX">The source x.</param>
         /// <param name="srcY">The source y.</param>
-        /// <param name="dstX">The DST x.</param>
-        /// <param name="dstY">The DST y.</param>
-        /// <param name="wd">The wd.</param>
-        /// <param name="ht">The ht.</param>
+        /// <param name="dstX">The destination x.</param>
+        /// <param name="dstY">The destination y.</param>
+        /// <param name="wd">The width.</param>
+        /// <param name="ht">The height.</param>
         /// <param name="stream">The stream.</param>
         /// <returns>NvCVStatus.</returns>
         public NvCVStatus CopyFrom(

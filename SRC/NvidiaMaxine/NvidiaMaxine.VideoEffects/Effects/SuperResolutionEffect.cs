@@ -1,14 +1,29 @@
-﻿using NvidiaMaxine.VideoEffects.API;
+﻿// ***********************************************************************
+// Assembly         : NvidiaMaxine.VideoEffects
+// Author           : Roman Miniailov
+// Created          : 12-21-2022
+//
+// Last Modified By : Roman Miniailov
+// Last Modified On : 12-22-2022
+// ***********************************************************************
+// <copyright file="SuperResolutionEffect.cs" company="Roman Miniailov">
+//     2022-2023
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
+
+using NvidiaMaxine.VideoEffects.API;
 using OpenCvSharp;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
+    /// <summary>
+    /// Super resolution effect.
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
+    /// </summary>
+    /// <seealso cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
     public class SuperResolutionEffect : BaseEffect
     {
         /// <summary>
@@ -24,7 +39,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         public int NewHeight { get; set; } = 1080;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SuperResolutionEffect"/> class.
+        /// Initializes a new instance of the <see cref="SuperResolutionEffect" /> class.
         /// </summary>
         /// <param name="modelsDir">The models dir.</param>
         /// <param name="sourceImage">The source image.</param>
@@ -41,6 +56,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             CheckResult(NvVFXAPI.NvVFX_SetU32(_handle, NvVFXParameterSelectors.NVVFX_MODE, (uint)Mode));
         }
 
+        /// <summary>
+        /// Allocs the buffers.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <returns>NvCVStatus.</returns>
         protected override NvCVStatus AllocBuffers(int width, int height)
         {
             NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
@@ -83,6 +104,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             return vfxErr;
         }
 
+        /// <summary>
+        /// Checks the scale isotropy.
+        /// </summary>
+        /// <param name="src">The source.</param>
+        /// <param name="dst">The DST.</param>
+        /// <returns>NvCVStatus.</returns>
         private NvCVStatus CheckScaleIsotropy(NvCVImage src, NvCVImage dst)
         {
             if (src.Width * dst.Height != src.Height * dst.Width)

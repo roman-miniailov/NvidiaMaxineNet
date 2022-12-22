@@ -1,14 +1,34 @@
-﻿using OpenCvSharp;
+﻿// ***********************************************************************
+// Assembly         : NvidiaMaxine.VideoEffects
+// Author           : Roman
+// Created          : 12-16-2022
+//
+// Last Modified By : Roman
+// Last Modified On : 12-22-2022
+// ***********************************************************************
+// <copyright file="Helpers.cs" company="Roman Miniailov">
+//     2022-2023
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
+
+using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace NvidiaMaxine.VideoEffects
 {
+    /// <summary>
+    /// Class Helpers.
+    /// </summary>
     public static class Helpers
     {
+        /// <summary>
+        /// Gets the video information.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="verbose">if set to <c>true</c> [verbose].</param>
+        /// <param name="info">The information.</param>
         public static void GetVideoInfo(VideoCapture reader, bool verbose, out VideoInfo info)
         {
             info = new VideoInfo();
@@ -31,6 +51,11 @@ namespace NvidiaMaxine.VideoEffects
             }
         }
 
+        /// <summary>
+        /// Convert duration to the string.
+        /// </summary>
+        /// <param name="sc">The sc.</param>
+        /// <returns>System.String.</returns>
         public static string DurationString(double sc)
         {
             string buf;
@@ -44,11 +69,23 @@ namespace NvidiaMaxine.VideoEffects
         }
 
 
+        /// <summary>
+        /// Determines whether the specified string has suffix.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <param name="suf">The suf.</param>
+        /// <returns><c>true</c> if the specified string has suffix; otherwise, <c>false</c>.</returns>
         public static bool HasSuffix(string str, string suf)
         {
             return Path.GetExtension(str).ToLowerInvariant() == suf.ToLowerInvariant();
         }
 
+        /// <summary>
+        /// Determines whether has one of these suffixes.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <param name="suffx">The suffx.</param>
+        /// <returns><c>true</c> if the string has one of these suffixes; otherwise, <c>false</c>.</returns>
         public static bool HasOneOfTheseSuffixes(string str, string[] suffx)
         {
             foreach (var suf in suffx)
@@ -62,11 +99,21 @@ namespace NvidiaMaxine.VideoEffects
             return false;
         }
 
+        /// <summary>
+        /// Determines whether [is image file] [the specified string].
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns><c>true</c> if is image file; otherwise, <c>false</c>.</returns>
         public static bool IsImageFile(string str)
         {
             return HasOneOfTheseSuffixes(str, new[] { ".bmp", ".jpg", ".jpeg", ".png" });
         }
 
+        /// <summary>
+        /// Determines whether [is lossy image file] [the specified string].
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns><c>true</c> if is lossy image file; otherwise, <c>false</c>.</returns>
         public static bool IsLossyImageFile(string str)
         {
             return HasOneOfTheseSuffixes(str, new[] { ".jpg", ".jpeg" });

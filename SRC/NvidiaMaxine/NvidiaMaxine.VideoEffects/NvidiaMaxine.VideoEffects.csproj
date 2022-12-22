@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0-windows;net6.0-windows;net7.0-windows</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<TargetFrameworks>net472;net48;net5.0-windows;net6.0-windows;net7.0-windows</TargetFrameworks>
 		<Nullable>disable</Nullable>
 		<Langversion>10.0</Langversion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -16,10 +15,11 @@
 		<Copyright>2022-2023</Copyright>
 		<PackageTags>nvidia, maxine, gpu, ai, super resolution</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</PackageProjectUrl>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
