@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFrameworks>net5.0-windows;net6.0-windows;net7.0-windows</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Langversion>10.0</Langversion>
@@ -19,6 +19,7 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</PackageProjectUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

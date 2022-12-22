@@ -8,13 +8,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{8DE390F5-D560-44AB-9208-C3DBE40F6D4D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DenoiseEffectApp", "VFXSamples\DenoiseEffectApp\DenoiseEffectApp.csproj", "{1888F484-3809-411E-BC43-A472C31AB3EB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E} = {8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainDemo", "VFXSamples\MainDemo\MainDemo.csproj", "{A7F54079-FE02-4219-9004-38270776B850}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A2645F4E-890F-456D-8599-BD49CF5B5285}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\LICENSE = ..\..\LICENSE
+		..\..\README.md = ..\..\README.md
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NvidiaMaxine.VideoEffects.Bridge", "NvidiaMaxine.VideoEffects.Bridge\NvidiaMaxine.VideoEffects.Bridge.vcxproj", "{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainDemo", "VFXSamples\MainDemo\MainDemo.csproj", "{A7F54079-FE02-4219-9004-38270776B850}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,18 +51,6 @@ Global
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Release|x64.Build.0 = Release|Any CPU
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Release|x86.ActiveCfg = Release|Any CPU
 		{1888F484-3809-411E-BC43-A472C31AB3EB}.Release|x86.Build.0 = Release|Any CPU
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|Any CPU.Build.0 = Debug|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|x64.ActiveCfg = Debug|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|x64.Build.0 = Debug|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|x86.ActiveCfg = Debug|Win32
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Debug|x86.Build.0 = Debug|Win32
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|Any CPU.ActiveCfg = Release|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|Any CPU.Build.0 = Release|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x64.ActiveCfg = Release|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x64.Build.0 = Release|x64
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x86.ActiveCfg = Release|Win32
-		{8FF49D2B-D2D4-4913-9512-17C1E04E1C6E}.Release|x86.Build.0 = Release|Win32
 		{A7F54079-FE02-4219-9004-38270776B850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7F54079-FE02-4219-9004-38270776B850}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7F54079-FE02-4219-9004-38270776B850}.Debug|x64.ActiveCfg = Debug|Any CPU

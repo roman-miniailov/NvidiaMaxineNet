@@ -1,4 +1,0 @@
-LIBRARY			NvidiaMaxine.VideoEffects.Bridge.DLL
-
-EXPORTS
-	mxtest
