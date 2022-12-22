@@ -8,7 +8,7 @@ Currently Windows only.
 
 [NuGet package](https://www.nuget.org/packages/NvidiaMaxine.VideoEffects/)
 
-## 3rd-party
+## Used 3rd-party packages
 
 - [CUDA API](https://github.com/hikipuro/CUDAnshita)
 - [OpenH264 encoder](https://github.com/cisco/openh264)
