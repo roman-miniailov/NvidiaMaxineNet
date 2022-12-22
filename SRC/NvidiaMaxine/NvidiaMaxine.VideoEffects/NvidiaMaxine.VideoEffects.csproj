@@ -1,16 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Langversion>10.0</Langversion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>AnyCPU;x64</Platforms>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>NvidiaMaxine.VideoEffects package (non-official)</Title>
+		<Authors>Roman Miniailov</Authors>
+		<Company>Roman Miniailov</Company>
+		<Description>Nvidia Maxine Video Capture SDK package for .Net Windows</Description>
+		<Copyright>2022-2023</Copyright>
+		<PackageTags>nvidia, maxine, gpu, ai, super resolution</PackageTags>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<RepositoryUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <Folder Include="CUDA\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 	<ItemGroup>

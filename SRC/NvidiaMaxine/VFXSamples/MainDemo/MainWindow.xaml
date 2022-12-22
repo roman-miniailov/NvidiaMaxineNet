@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MainDemo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="683" Width="800">
+        Title="Nvidia Maxine Video Effects SDK Demo" Height="423" Width="813" Background="#1f1f1f">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="110"/>
             <RowDefinition Height="200"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -19,53 +19,59 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="0" Background="LightSlateGray">
+        <Grid Grid.Row="0" Grid.Column="0" >
             <Label Foreground="White" Margin="10,5,0,10" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Top">SOURCE</Label>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,40,0,0" >
-                <RadioButton x:Name="rbWebcam" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center">Webcam</RadioButton>
+                <RadioButton x:Name="rbWebcam" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White">Webcam</RadioButton>
                 <ComboBox x:Name="cbWebcam" Width="274" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center">LALALA</ComboBox>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,70,0,0">
-                <RadioButton x:Name="rbFile" Width="75" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center">File</RadioButton>
+                <RadioButton x:Name="rbFile" Width="75" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White">File</RadioButton>
                 <TextBox x:Name="edSourceFilename" Width="250" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center">c:\VF\x\!video.avi</TextBox>
                 <Button x:Name="btSelectSourceFile" Width="24" Height="24">...</Button>
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="0" Background="LightGray">
+        <Grid Grid.Row="1" Grid.Column="0">
             <Label Foreground="White" Margin="10,5,0,10" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Top">EFFECTS</Label>
+
+            <Grid Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <RadioButton Grid.Column="0" x:Name="rbEffDenoise" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsChecked="true" Foreground="White">Denoise</RadioButton>
+                <RadioButton Grid.Column="1" x:Name="rbEffArtReduction" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Foreground="White">Artifact Reduction</RadioButton>
+                <RadioButton Grid.Column="0" x:Name="rbEffUpscale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Foreground="White">Upscale</RadioButton>
+                <RadioButton Grid.Column="1" x:Name="rbEffSuperRes" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Foreground="White">Super Resolution</RadioButton>
+            </Grid>            
         </Grid>
 
-        <Grid Grid.Row="2" Grid.Column="0" Background="LightSlateGray">
+        <Grid Grid.Row="2" Grid.Column="0">
             <Label Foreground="White" Margin="10,5,0,10" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Top">OUTPUT</Label>
 
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,40,0,0">
-                    <Label Width="75" HorizontalAlignment="Left" VerticalAlignment="Center">File name</Label>
+                    <Label Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White">File name</Label>
                     <TextBox x:Name="edOutputFilename" Width="250" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center">c:\VF\x\outx.mp4</TextBox>
                     <Button x:Name="btSelectOutputFile" Width="24" Height="24">...</Button>
                 </StackPanel>
-
-
-
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="3" Grid.Column="0" Background="LightGray">
-
+        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="400" Height="312" Background="Black">
+            <Image x:Name="pnScreen" Width="400" Height="312"></Image>
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="400" Height="300" Background="Black">
-            <Image x:Name="pnScreen" Width="400" Height="300"></Image>
-        </Grid>
-
-        <Grid Grid.Row="2" Grid.Column="1" Background="LightSlateGray">
+        <Grid Grid.Row="2" Grid.Column="1">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0">
                 <Button x:Name="btStart" Click="btStart_Click" Width="50" Height="24" Margin="5,0,0,0">Start</Button>
                 <Button x:Name="btStop" Click="btStop_Click" Width="50" Height="24" Margin="5,0,0,0">Stop</Button>
                 <ProgressBar x:Name="pbProgress" Width="200" Height="24" Margin="5,0,0,0"></ProgressBar>
+                <CheckBox x:Name="cbPreview" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="White">Preview</CheckBox>
             </StackPanel>
         </Grid>
     </Grid>
