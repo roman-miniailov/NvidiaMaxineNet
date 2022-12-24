@@ -81,4 +81,40 @@ namespace NvidiaMaxine.VideoEffects.API
         /// </summary>
         NVCV_YUV444 = 12,
     }
+
+    public static class NvCVImagePixelFormatExtensions
+    {
+        public static int GetChannelsCount(this NvCVImagePixelFormat format)
+        {
+            switch (format)
+            {
+                case NvCVImagePixelFormat.NVCV_Y:
+                    return 1;
+                case NvCVImagePixelFormat.NVCV_A:
+                    return 1;
+                case NvCVImagePixelFormat.NVCV_YA:
+                    return 2;
+                case NvCVImagePixelFormat.NVCV_RGB:
+                    return 3;
+                case NvCVImagePixelFormat.NVCV_BGR:
+                    return 3;
+                case NvCVImagePixelFormat.NVCV_RGBA:
+                    return 4;
+                case NvCVImagePixelFormat.NVCV_BGRA:
+                    return 4;
+                case NvCVImagePixelFormat.NVCV_ARGB:
+                    return 4;
+                case NvCVImagePixelFormat.NVCV_ABGR:
+                    return 4;
+                case NvCVImagePixelFormat.NVCV_YUV420:
+                    return 3;
+                case NvCVImagePixelFormat.NVCV_YUV422:
+                    return 3;
+                case NvCVImagePixelFormat.NVCV_YUV444:
+                    return 3;
+                default:
+                    return 0;
+            }
+        }
+    }
 }

@@ -4,21 +4,12 @@ using NvidiaMaxine.VideoEffects.Outputs;
 using NvidiaMaxine.VideoEffects.Sources;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MainDemo
 {
@@ -41,6 +32,8 @@ namespace MainDemo
 
         private BaseEffect _currentEffect;
 
+        private bool _stopFlag = false;
+
         private ulong _frameID;
 
         private ulong _totalFrames;
@@ -62,6 +55,7 @@ namespace MainDemo
         {
             _frameID = 0;
             _lastProgress = 0;
+            _stopFlag = false;
 
             // add source
             VideoInfo info = new VideoInfo();
@@ -80,6 +74,15 @@ namespace MainDemo
 
                 _source.GetVideoInfo(out info);
                 _totalFrames = (ulong)info.FrameCount;
+            }
+            else
+            {
+                _source = new CameraVideoSource();
+                (_source as CameraVideoSource).Open(cbCamera.Text);
+                _source.FrameReady += Source_FrameReady;
+
+                _source.GetVideoInfo(out info);
+                _totalFrames = 0;
             }
 
             // add output
@@ -132,13 +135,16 @@ namespace MainDemo
 
             //OpenCvSharp.Cv2.ImWrite("c:\\vf\\x\\proc.jpg", processedFrame);
 
-            var progress = (int)((_frameID * 100) / _totalFrames);
-            if (progress != _lastProgress)
+            if (_totalFrames > 0)
             {
-                _lastProgress = progress;
-                UpdateProgress(progress);
+                var progress = (int)((_frameID * 100) / _totalFrames);
+                if (progress != _lastProgress)
+                {
+                    _lastProgress = progress;
+                    UpdateProgress(progress);
+                }
             }
-
+            
             Dispatcher.Invoke(() =>
             {
                 if (cbPreview.IsChecked == true)
@@ -162,6 +168,10 @@ namespace MainDemo
 
         private void StopAll()
         {
+            _stopFlag = true;
+
+            Thread.Sleep(250);
+
             _source?.Stop();
             _source?.Dispose();
             _source = null;
@@ -187,11 +197,20 @@ namespace MainDemo
             Dispatcher.Invoke(() =>
             {
                 pbProgress.Value = 0;
+
+                pnScreen.BeginInit();
+                pnScreen.Source = null;
+                pnScreen.EndInit();
             });
         }
 
         private void RenderFrame(OpenCvSharp.Mat frame)
         {
+            if (_stopFlag)
+            {
+                return;
+            }
+
             if (_previewBitmap == null || _previewBitmap.PixelWidth != frame.Width || _previewBitmap.PixelHeight != frame.Height || pnScreen.Source == null)
             {
                 var dpi = VisualTreeHelper.GetDpi(pnScreen);
@@ -215,6 +234,20 @@ namespace MainDemo
         private void btStop_Click(object sender, RoutedEventArgs e)
         {
             StopAll();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var list = CameraVideoSource.ListDevices();
+            foreach (var item in list)
+            {
+                cbCamera.Items.Add(item);
+            }
+
+            if (cbCamera.Items.Count > 0)
+            {
+                cbCamera.SelectedIndex = 0;
+            }
         }
     }
 }

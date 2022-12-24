@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NvidiaMaxine.VideoEffects
+﻿namespace NvidiaMaxine.VideoEffects
 {
     public class VideoInfo
     {
@@ -20,6 +12,10 @@ namespace NvidiaMaxine.VideoEffects
         
         public long FrameCount { get; set; }
 
+#if OPENCV
         public OpenCvSharp.Size Resolution { get { return new OpenCvSharp.Size(Width, Height); } }
+#else
+        public System.Drawing.Size Resolution { get { return new System.Drawing.Size(Width, Height); } }
+#endif
     }
 }

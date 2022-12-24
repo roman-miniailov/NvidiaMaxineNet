@@ -12,7 +12,10 @@
 // <summary></summary>
 // ***********************************************************************
 
+#if OPENCV
 using OpenCvSharp;
+#endif
+
 using System;
 using System.IO;
 
@@ -23,6 +26,7 @@ namespace NvidiaMaxine.VideoEffects
     /// </summary>
     public static class Helpers
     {
+#if OPENCV
         /// <summary>
         /// Gets the video information.
         /// </summary>
@@ -50,6 +54,7 @@ namespace NvidiaMaxine.VideoEffects
                   $"   duration {dur}\n");
             }
         }
+#endif
 
         /// <summary>
         /// Convert duration to the string.

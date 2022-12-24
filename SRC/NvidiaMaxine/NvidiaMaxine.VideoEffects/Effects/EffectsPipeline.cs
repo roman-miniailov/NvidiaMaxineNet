@@ -1,9 +1,4 @@
-﻿using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
@@ -26,10 +21,10 @@ namespace NvidiaMaxine.VideoEffects.Effects
             _effects.Clear();
         }
 
-        public void PushFrame(Mat frame)
-        {
+        //public void PushFrame(Mat frame)
+        //{
             
-        }
+        //}
         
         public bool Init(VideoInfo info)
         {

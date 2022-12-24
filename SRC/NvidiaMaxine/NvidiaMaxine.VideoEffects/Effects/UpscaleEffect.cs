@@ -13,7 +13,11 @@
 // ***********************************************************************
 
 using NvidiaMaxine.VideoEffects.API;
+
+#if OPENCV
 using OpenCvSharp;
+#endif
+
 using System;
 
 namespace NvidiaMaxine.VideoEffects.Effects
@@ -44,7 +48,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// </summary>
         /// <param name="modelsDir">The models dir.</param>
         /// <param name="sourceImage">The source image.</param>
+#if OPENCV
         public UpscaleEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
+#else
+        public UpscaleEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
+#endif
         {
         }
 
@@ -69,8 +77,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             if (_srcImg == null || _srcImg.Data == IntPtr.Zero)
             {
                 // src CPU
+#if OPENCV
                 _srcImg = new Mat();
                 _srcImg.Create(height, width, MatType.CV_8UC3);
+#else
+                _srcImg = new VideoFrame(height, width, NvCVImagePixelFormat.NVCV_RGB, NvCVImageComponentType.NVCV_U8);
+#endif
 
                 if (_srcImg.Data == IntPtr.Zero)
                 {
@@ -78,9 +90,14 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 }
             }
 
-            _dstImg = new Mat();
             int dstWidth = _srcImg.Width * NewHeight / _srcImg.Height;
+#if OPENCV
+            _dstImg = new Mat();
             _dstImg.Create(NewHeight, dstWidth, _srcImg.Type());
+#else
+            _dstImg = new VideoFrame(dstWidth, NewHeight, _srcImg.PixelFormat, _srcImg.ComponentType);
+#endif
+
             if (_dstImg.Data == IntPtr.Zero)
             {
                 return NvCVStatus.NVCV_ERR_MEMORY;
@@ -88,11 +105,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             // src GPU
             _srcGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Width, (uint)_srcImg.Height, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
 
             //dst GPU
             _dstGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Cols, (uint)_dstImg.Rows, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Width, (uint)_dstImg.Height, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
 
             //CheckResult(CheckScaleIsotropy(_srcGpuBuf, _dstGpuBuf));
 

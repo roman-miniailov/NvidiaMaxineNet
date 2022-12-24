@@ -1,11 +1,8 @@
-﻿using CUDA;
-using NvidiaMaxine.VideoEffects.API;
+﻿using NvidiaMaxine.VideoEffects.API;
+
+#if OPENCV
 using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+#endif
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
@@ -13,8 +10,17 @@ namespace NvidiaMaxine.VideoEffects.Effects
     {
         public float Strength { get; set; } = 0;
 
+#if OPENCV
         public DenoiseEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
+#else
+        public DenoiseEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
+#endif
         {
+            if (sourceImage.Width > 1920 || sourceImage.Height > 1080)
+            {
+                throw new System.Exception("Denoise effects supports up to 1920x1080 resolution.");
+            }
+
             _useState = true;
         }
 

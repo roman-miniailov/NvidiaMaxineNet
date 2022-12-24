@@ -15,11 +15,15 @@
 		<Copyright>2022-2023</Copyright>
 		<PackageTags>nvidia, maxine, gpu, ai, super resolution</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<AssemblyVersion>1.0.1.0</AssemblyVersion>
+		<AssemblyVersion>1.0.2.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</PackageProjectUrl>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
+	</PropertyGroup>
+
+	<PropertyGroup>
+	  <DefineConstants>$(DefineConstants);OPENCV</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -38,6 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DirectShowLib.Standard" Version="2.1.0" />
 		<PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
 	</ItemGroup>
 	<ItemGroup Condition=" $(TargetFramework.Contains('windows')) or '$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'netcoreapp3.1' ">

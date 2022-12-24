@@ -1,4 +1,20 @@
-﻿using NvidiaMaxine.VideoEffects.API;
+﻿// ***********************************************************************
+// Assembly         : NvidiaMaxine.VideoEffects
+// Author           : Roman
+// Created          : 12-19-2022
+//
+// Last Modified By : Roman
+// Last Modified On : 12-22-2022
+// ***********************************************************************
+// <copyright file="FileVideoSource.cs" company="Roman Miniailov">
+//     2022-2023
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
+
+#if OPENCV
+
+using NvidiaMaxine.VideoEffects.API;
 using OpenCvSharp;
 using System;
 using System.Threading;
@@ -6,6 +22,13 @@ using System.Threading.Tasks;
 
 namespace NvidiaMaxine.VideoEffects.Sources
 {
+    /// <summary>
+    /// File video source.
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Sources.IBaseSource" />
+    /// Implements the <see cref="System.IDisposable" />
+    /// </summary>
+    /// <seealso cref="NvidiaMaxine.VideoEffects.Sources.IBaseSource" />
+    /// <seealso cref="System.IDisposable" />
     public class FileVideoSource : IBaseSource, IDisposable
     {
         private VideoCapture _reader;
@@ -18,10 +41,22 @@ namespace NvidiaMaxine.VideoEffects.Sources
 
         private Mat _frame;
 
+        /// <summary>
+        /// Occurs when new frame arrived.
+        /// </summary>
         public event EventHandler<VideoFrameEventArgs> FrameReady;
 
+        /// <summary>
+        /// Occurs when playback completed.
+        /// </summary>
         public event EventHandler<EventArgs> Complete;
 
+        /// <summary>
+        /// Opens the specified filename.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <returns>NvidiaMaxine.VideoEffects.API.NvCVStatus.</returns>
+        /// <exception cref="Exception">Failed to open video file: " + filename</exception>
         public NvCVStatus Open(string filename)
         {
             _reader = new VideoCapture();
@@ -44,11 +79,18 @@ namespace NvidiaMaxine.VideoEffects.Sources
             return NvCVStatus.NVCV_SUCCESS;
         }
 
+        /// <summary>
+        /// Gets the base frame.
+        /// </summary>
+        /// <returns>OpenCvSharp.Mat.</returns>
         public Mat GetBaseFrame()
         {
             return _frame;
         }
-    
+
+        /// <summary>
+        /// Starts this instance.
+        /// </summary>
         public void Start()
         {
             _stopFlag = false;
@@ -75,6 +117,9 @@ namespace NvidiaMaxine.VideoEffects.Sources
             });            
         }
 
+        /// <summary>
+        /// Stops this instance.
+        /// </summary>
         public void Stop()
         {
             _stopFlag = true;
@@ -85,11 +130,19 @@ namespace NvidiaMaxine.VideoEffects.Sources
             }
         }
 
+        /// <summary>
+        /// Gets the video information.
+        /// </summary>
+        /// <param name="info">The information.</param>
         public void GetVideoInfo(out VideoInfo info)
         {
             Helpers.GetVideoInfo(_reader, false, out info);
         }
 
+        /// <summary>
+        /// Disposes the specified disposing.
+        /// </summary>
+        /// <param name="disposing">The disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -105,12 +158,18 @@ namespace NvidiaMaxine.VideoEffects.Sources
             }
         }
 
+        /// <summary>
+        /// Finalizes this instance.
+        /// </summary>
         ~FileVideoSource()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: false);
         }
 
+        /// <summary>
+        /// Disposes this instance.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -119,3 +178,5 @@ namespace NvidiaMaxine.VideoEffects.Sources
         }
     }
 }
+
+#endif

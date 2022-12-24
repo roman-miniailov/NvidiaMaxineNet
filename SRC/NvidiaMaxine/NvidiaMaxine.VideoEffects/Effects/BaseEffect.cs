@@ -1,6 +1,11 @@
 ﻿using CUDA;
 using NvidiaMaxine.VideoEffects.API;
+
+#if OPENCV
 using OpenCvSharp;
+using static OpenCvSharp.FileStorage;
+#endif
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +14,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static OpenCvSharp.FileStorage;
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
@@ -27,9 +31,15 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private bool disposedValue;
 
+#if OPENCV
         protected Mat _srcImg;
 
         protected Mat _dstImg;
+#else
+        protected VideoFrame _srcImg;
+
+        protected VideoFrame _dstImg;
+#endif
 
         protected NvCVImage _srcGpuBuf;
 
@@ -46,7 +56,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// </summary>
         private NvCVImage _tmpVFX;
 
+#if OPENCV
         public BaseEffect(string id, string modelsDir, Mat sourceImage)
+#else
+        public BaseEffect(string id, string modelsDir, VideoFrame sourceImage)
+#endif
         {
             _id = id;
             _modelsDir = modelsDir;
@@ -109,6 +123,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
             _dstGpuBuf.Destroy();
         }
 
+#if OPENCV
         protected static void NVWrapperForCVMat(Mat cvIm, ref NvCVImage nvcvIm)
         {
             NvCVImagePixelFormat[] nvFormat = new[] { NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN, NvCVImagePixelFormat.NVCV_Y, NvCVImagePixelFormat.NVCV_YA, NvCVImagePixelFormat.NVCV_BGR, NvCVImagePixelFormat.NVCV_BGRA };
@@ -116,8 +131,8 @@ namespace NvidiaMaxine.VideoEffects.Effects
               NvCVImageComponentType.NVCV_F32, NvCVImageComponentType.NVCV_F64, NvCVImageComponentType.NVCV_TYPE_UNKNOWN };
 
             nvcvIm.Pixels = cvIm.Data;
-            nvcvIm.Width = (uint)cvIm.Cols;
-            nvcvIm.Height = (uint)cvIm.Rows;
+            nvcvIm.Width = (uint)cvIm.Width;
+            nvcvIm.Height = (uint)cvIm.Height;
             nvcvIm.Pitch = (int)cvIm.Step(0);
             nvcvIm.PixelFormat = nvFormat[cvIm.Channels() <= 4 ? cvIm.Channels() : 0];
             nvcvIm.ComponentType = nvType[cvIm.Depth() & 7];
@@ -132,6 +147,27 @@ namespace NvidiaMaxine.VideoEffects.Effects
             nvcvIm.Reserved1 = 0;
             nvcvIm.Reserved2 = 0;
         }
+#else
+        protected static void NVWrapperForCVMat(VideoFrame cvIm, ref NvCVImage nvcvIm)
+        {
+            nvcvIm.Pixels = cvIm.Data;
+            nvcvIm.Width = (uint)cvIm.Width;
+            nvcvIm.Height = (uint)cvIm.Height;
+            nvcvIm.Pitch = (int)cvIm.Stride;
+            nvcvIm.PixelFormat = cvIm.PixelFormat;
+            nvcvIm.ComponentType = cvIm.ComponentType;
+            nvcvIm.BufferBytes = 0;
+            //nvcvIm.DeletePtr = null;
+            //nvcvIm.DeleteProc = null;
+            nvcvIm.PixelBytes = cvIm.PixelBytes;
+            nvcvIm.ComponentBytes = cvIm.ComponentBytes;
+            nvcvIm.NumComponents = cvIm.NumComponents;
+            nvcvIm.Planar = NvCVLayout.NVCV_CHUNKY;
+            nvcvIm.GpuMem = NvCVMemSpace.NVCV_CPU;
+            nvcvIm.Reserved1 = 0;
+            nvcvIm.Reserved2 = 0;
+        }
+#endif
 
         // Allocate one temp buffer to be used for input and output. Reshaping of the temp buffer in NvCVImage_Transfer() is done automatically,
         // and is very low overhead. We expect the destination to be largest, so we allocate that first to minimize reallocs probablistically.
@@ -201,17 +237,35 @@ namespace NvidiaMaxine.VideoEffects.Effects
             if (_srcImg == null || _srcImg.Data == IntPtr.Zero)
             {
                 // src CPU
+#if OPENCV
                 _srcImg = new Mat();
                 _srcImg.Create(height, width, MatType.CV_8UC3);
+#else
+                _srcImg = new VideoFrame(width, height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_U8);
+#endif
 
                 if (_srcImg.Data == IntPtr.Zero)
                 {
                     return NvCVStatus.NVCV_ERR_MEMORY;
                 }
             }
+            else
+            {
+#if !OPENCV
+                if (_srcImg.PixelFormat != NvCVImagePixelFormat.NVCV_BGR || _srcImg.ComponentType != NvCVImageComponentType.NVCV_U8)
+                {
+                    return NvCVStatus.NVCV_ERR_PARAMETER;
+                }
+#endif
+            }
 
+#if OPENCV
             _dstImg = new Mat();
-            _dstImg.Create(_srcImg.Rows, _srcImg.Cols, _srcImg.Type());
+            _dstImg.Create(_srcImg.Height, _srcImg.Width, _srcImg.Type());
+#else
+            _dstImg = new VideoFrame(_srcImg.Width, _srcImg.Height, _srcImg.PixelFormat, _srcImg.ComponentType);
+#endif
+            
             if (_dstImg.Data == IntPtr.Zero)
             {
                 return NvCVStatus.NVCV_ERR_MEMORY;
@@ -219,11 +273,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             // src GPU
             _srcGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Cols, (uint)_srcImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Width, (uint)_srcImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             //dst GPU
             _dstGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Cols, (uint)_dstImg.Rows, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Width, (uint)_dstImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
             NVWrapperForCVMat(_dstImg, ref _dstVFX);      // _dstVFX is an alias for _dstImg
@@ -233,7 +287,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
             return vfxErr;
         }
 
+#if OPENCV
         public Mat Process()
+#else
+        public VideoFrame Process()
+#endif
         {
             CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, _stream, _tmpVFX));
             CheckResult(NvVFXAPI.NvVFX_Run(_handle, 0));

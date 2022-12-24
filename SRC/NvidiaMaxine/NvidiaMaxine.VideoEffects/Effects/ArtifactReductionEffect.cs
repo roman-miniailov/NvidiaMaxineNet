@@ -13,7 +13,10 @@
 // ***********************************************************************
 
 using NvidiaMaxine.VideoEffects.API;
+
+#if OPENCV
 using OpenCvSharp;
+#endif
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
@@ -29,16 +32,20 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// </summary>
         /// <value>The mode.</value>
         public ArtifactReductionEffectMode Mode { get; set; } = ArtifactReductionEffectMode.LowBitrate;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactReductionEffect"/> class.
         /// </summary>
         /// <param name="modelsDir">The models dir.</param>
         /// <param name="sourceImage">The source image.</param>
+#if OPENCV
         public ArtifactReductionEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
+#else
+        public ArtifactReductionEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
+#endif
         {
-
         }
+
 
         /// <summary>
         /// Applies the effect.

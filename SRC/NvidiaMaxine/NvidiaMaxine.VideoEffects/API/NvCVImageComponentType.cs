@@ -60,4 +60,35 @@
         /// </summary>
         NVCV_F64 = 10,
     }
+
+    public static class NvCVImageComponentTypeExtensions
+    {
+        public static int GetComponentBytes(this NvCVImageComponentType componentType)
+        {
+            switch (componentType)
+            {
+                case NvCVImageComponentType.NVCV_U8:
+                    return 1;
+                case NvCVImageComponentType.NVCV_U16:
+                case NvCVImageComponentType.NVCV_S16:
+                case NvCVImageComponentType.NVCV_F16:
+                    return 2;
+                case NvCVImageComponentType.NVCV_U32:
+                case NvCVImageComponentType.NVCV_S32:
+                case NvCVImageComponentType.NVCV_F32:
+                    return 4;
+                case NvCVImageComponentType.NVCV_U64:
+                case NvCVImageComponentType.NVCV_S64:
+                case NvCVImageComponentType.NVCV_F64:
+                    return 8;
+                default:
+                    return 0;
+            }
+        }
+
+        public static int GetPixelBytes(this NvCVImageComponentType componentType, int numComponents)
+        {
+            return componentType.GetComponentBytes() * numComponents;
+        }        
+    }
 }

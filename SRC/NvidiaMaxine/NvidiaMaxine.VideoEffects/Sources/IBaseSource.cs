@@ -1,9 +1,4 @@
-﻿using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace NvidiaMaxine.VideoEffects.Sources
 {
@@ -19,6 +14,10 @@ namespace NvidiaMaxine.VideoEffects.Sources
 
         public void GetVideoInfo(out VideoInfo info);
 
-        public Mat GetBaseFrame();
+#if OPENCV
+        public OpenCvSharp.Mat GetBaseFrame();
+#else
+        public VideoFrame GetBaseFrame();
+#endif
     }
 }
