@@ -1,18 +1,24 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.VideoEffects
-// Author           : roman
-// Created          : 12-21-2022
+// Author           : Roman Miniailov
+// Created          : 12-26-2022
 //
-// Last Modified By : roman
-// Last Modified On : 12-21-2022
+// Last Modified By : Roman Miniailov
+// Last Modified On : 12-26-2022
 // ***********************************************************************
-// <copyright file="AIGSEffect.cs" company="NvidiaMaxine.VideoEffects">
-//     Copyright (c) . All rights reserved.
+// <copyright file="AIGSEffect.cs" company="">
+//     Copyright (c) 2006-2022
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
 
 using NvidiaMaxine.VideoEffects.API;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Runtime.InteropServices;
 
 #if OPENCV
 using OpenCvSharp;
@@ -48,17 +54,25 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private uint _modelBatch;
 
+#if OPENCV
         private Mat _bgImg;
 
         private Mat _resizedCroppedBgImg;
+        
+        private Mat _result;
+#else
+        private VideoFrame _bgImg;
+
+        private VideoFrame _resizedCroppedBgImg;
+
+        private VideoFrame _result;
+#endif
 
         private NvCVImage _srcNvVFXImage;
 
         private NvCVImage _dstNvVFXImage;
 
         private NvCVImage _blurNvVFXImage;
-
-        private Mat _result;
 
         private long _count;
 
@@ -91,7 +105,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         public AIGSEffect(string modelsDir, Mat sourceImage, AIGSEffectMode effectMode)
             : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
 #else
-        public AIGSEffect(string modelsDir, VideoFrame sourceImage, AIGSEffectMode effectMode) 
+        public AIGSEffect(string modelsDir, VideoFrame sourceImage, AIGSEffectMode effectMode)
             : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
 #endif
         {
@@ -123,7 +137,8 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private void CreateBackgroundBlurEffect()
         {
-            // ------------------ create Background blur effect ------------------ //
+            // Create Background blur effect
+
             CheckResult(NvVFXAPI.NvVFX_CreateEffect(NvVFXFilterSelectors.NVVFX_FX_BGBLUR, out _bgblurEff));
             //CheckResult(NvVFXAPI.NvVFX_GetString(_bgblurEff, NvVFXParameterSelectors.NVVFX_INFO, cstr));
             CheckResult(NvVFXAPI.NvVFX_SetCudaStream(_bgblurEff, NvVFXParameterSelectors.NVVFX_CUDA_STREAM, _stream));
@@ -179,27 +194,40 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 throw new FileNotFoundException("Background image not found", BackgroundImage);
             }
 
+#if OPENCV
             _bgImg = Cv2.ImRead(BackgroundImage);
+#else
+            _bgImg = VideoFrame.LoadFromFile(BackgroundImage);
+#endif
+            
             if (_bgImg.Data == IntPtr.Zero)
             {
                 throw new Exception("Background image not loaded");
             }
             else
             {
+#if OPENCV         
                 // Find the scale to resize background such that image can fit into background
                 float scale = (float)height / (float)_bgImg.Height;
                 if ((scale * _bgImg.Width) < (float)width)
                 {
                     scale = (float)width / (float)_bgImg.Width;
                 }
-
-                Mat resizedBg = new Mat();
+                var resizedBg = new Mat();
                 Cv2.Resize(_bgImg, resizedBg, new Size(), scale, scale, InterpolationFlags.Area);
+#else
+                var resizedBg = _bgImg.ResizeImage24(width, height);
+#endif
 
-                // Always crop from top left of background.
-                Rect rect = new Rect(0, 0, width, height);
+                // Always crop from top left of background.                
 
+#if OPENCV
+                var rect = new Rect(0, 0, width, height);
                 _resizedCroppedBgImg = new Mat(resizedBg, rect);
+#else
+                var rect = new Rectangle(0, 0, width, height);
+                _resizedCroppedBgImg = ImageHelper.Crop(resizedBg, rect);
+#endif
             }
 
             return true;
@@ -243,8 +271,6 @@ namespace NvidiaMaxine.VideoEffects.Effects
             {
                 CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _blurNvVFXImage, (uint)width, (uint)height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_CHUNKY, NvCVMemSpace.NVCV_GPU, 1));
             }
-
-
 
             //            if (_srcImg == null || _srcImg.Data == IntPtr.Zero)
             //            {
@@ -306,12 +332,20 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <param name="mask">The mask.</param>
         /// <param name="alpha">The alpha.</param>
         /// <param name="result">The result.</param>
+#if OPENCV
         private static void Overlay(Mat image, Mat mask, float alpha, out Mat result)
+#else
+        private static void Overlay(VideoFrame image, VideoFrame mask, float alpha, out VideoFrame result)
+#endif
         {
+#if OPENCV
             Mat maskClr = new Mat();
             Cv2.CvtColor(mask, maskClr, ColorConversionCodes.GRAY2BGR);
             result = image * (1.0f - alpha) + maskClr * alpha;
             maskClr.Dispose();
+#else
+            throw new NotImplementedException("Overlay not implemented yet.");
+#endif
         }
 
         /// <summary>
@@ -327,12 +361,17 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             CheckResult(AllocBuffers(width, height));
 
+#if OPENCV
             _dstImg = new Mat(_srcImg.Size(), MatType.CV_8UC1);
-
             _result = new Mat();
-            _result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);  // Make sure the result is allocated. TODO: allocate outsifde of the loop?
-            CheckNull(_result.Data, NvCVStatus.NVCV_ERR_MEMORY);
+            _result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);  
+#else
+            _dstImg = new VideoFrame(_srcImg.Width, _srcImg.Height, NvCVImagePixelFormat.NVCV_Y, NvCVImageComponentType.NVCV_U8);
+            _result = new VideoFrame(_srcImg.Width, _srcImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_U8);
+#endif
             
+            CheckNull(_result.Data, NvCVStatus.NVCV_ERR_MEMORY);
+
             _count = 0;
             _total = 0;
 
@@ -348,15 +387,19 @@ namespace NvidiaMaxine.VideoEffects.Effects
 #else
         public override VideoFrame Process()
 #endif
-        {           
+        {
             //CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, _stream, _tmpVFX));
             //CheckResult(NvVFXAPI.NvVFX_Run(_handle, 0));
             //CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstGpuBuf, _dstVFX, 255.0f, _stream, _tmpVFX));
 
             //return _dstImg;
 
+#if OPENCV
             _dstImg.SetTo(new Scalar(0));
-
+#else
+            _dstImg.Clear();
+#endif
+            
             NVWrapperForCVMat(_srcImg, ref _srcVFX);
             NVWrapperForCVMat(_dstImg, ref _dstVFX);
 
@@ -393,8 +436,13 @@ namespace NvidiaMaxine.VideoEffects.Effects
             CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstNvVFXImage, _dstVFX, 1.0f, _stream, IntPtr.Zero));
 
             NvCVImage matVFX = new NvCVImage();
-                        
-            _result.SetTo(Scalar.All(0));  // TODO: This may no longer be necessary since we no longer coerce to 16:9
+
+#if OPENCV
+            _result.SetTo(Scalar.All(0));  
+#else
+            _result.Clear();
+#endif
+            
             switch (EffectMode)
             {
                 case AIGSEffectMode.None:
@@ -405,15 +453,17 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     {
                         if (string.IsNullOrEmpty(BackgroundImage))
                         {
+#if OPENCV
                             _resizedCroppedBgImg = new Mat(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3, new Scalar(118, 185, 0));
                             var startX = _resizedCroppedBgImg.Cols / 20;
                             var offsetY = _resizedCroppedBgImg.Rows / 20;
                             string text = "No Background Image!";
-                            for (var startY = offsetY; startY < _resizedCroppedBgImg.Rows; startY += offsetY)
+                            for (var startY = offsetY; startY < _resizedCroppedBgImg.Height; startY += offsetY)
                             {
                                 Cv2.PutText(_resizedCroppedBgImg, text, new Point(startX, startY),
                                     HersheyFonts.HersheyDuplex, 1.0, Scalar.FromRgb(0, 0, 0), 1);
                             }
+#endif
                         }
 
                         NvCVImage bgVFX = new NvCVImage();
@@ -423,7 +473,8 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     }
 
                     break;
-
+                    
+#if OPENCV
                 case AIGSEffectMode.Light:
                     //if (inFile)
                     //{
@@ -440,6 +491,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     //}
 
                     break;
+#endif
 
                 case AIGSEffectMode.Green:
                     {
@@ -460,7 +512,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     break;
 
                 case AIGSEffectMode.Matte:
-                    Cv2.CvtColor(_dstImg, _result, ColorConversionCodes.GRAY2BGR);
+                    //Cv2.CvtColor(_dstImg, _result, ColorConversionCodes.GRAY2BGR);
+                    var res = ImageHelper.ConvertGrayscaleToRGB(_dstImg);
+                    res.CopyTo(_result);
+                    res.Dispose();
+                    
                     break;
 
                 case AIGSEffectMode.Blur:
@@ -505,7 +561,6 @@ namespace NvidiaMaxine.VideoEffects.Effects
             //        fprintf(stderr, "\b\b\b\b???%%");
             //    else
             //        fprintf(stderr, "\b\b\b\b%3.0f%%", 100.f * frameNum / info.frameCount);
-
         }
     }
 }

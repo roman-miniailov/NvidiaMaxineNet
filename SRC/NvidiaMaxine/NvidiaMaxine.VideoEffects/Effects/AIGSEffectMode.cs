@@ -24,10 +24,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// </summary>
         Matte,
 
+#if OPENCV
         /// <summary>
         /// The light.
         /// </summary>
         Light,
+#endif
 
         /// <summary>
         /// The green.

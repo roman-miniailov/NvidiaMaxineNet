@@ -54,7 +54,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         public UpscaleEffect(string modelsDir, Mat sourceImage, float strength = 0.4f, int newHeight = 1080)
             : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
 #else
-        public UpscaleEffect(string modelsDir, VideoFrame sourceImage) 
+        public UpscaleEffect(string modelsDir, VideoFrame sourceImage, float strength = 0.4f, int newHeight = 1080) 
             : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
 #endif
         {

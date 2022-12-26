@@ -43,7 +43,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         public ArtifactReductionEffect(string modelsDir, Mat sourceImage, ArtifactReductionEffectMode mode = ArtifactReductionEffectMode.LowBitrate)
             : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
 #else
-        public ArtifactReductionEffect(string modelsDir, VideoFrame sourceImage) 
+        public ArtifactReductionEffect(string modelsDir, VideoFrame sourceImage, ArtifactReductionEffectMode mode = ArtifactReductionEffectMode.LowBitrate) 
             : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
 #endif
         {

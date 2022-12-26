@@ -35,7 +35,6 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <value>The strength.</value>
         public float Strength { get; set; }
 
-#if OPENCV
         /// <summary>
         /// Initializes a new instance of the <see cref="DenoiseEffect"/> class.
         /// </summary>
@@ -43,16 +42,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <param name="strength">The strength.</param>
         /// <param name="sourceImage">The source image.</param>
         /// <exception cref="System.Exception">Denoise effects supports up to 1920x1080 resolution.</exception>
+#if OPENCV
         public DenoiseEffect(string modelsDir, Mat sourceImage, float strength = 0.7f)
             : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
 #else
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DenoiseEffect"/> class.
-        /// </summary>
-        /// <param name="modelsDir">The models dir.</param>
-        /// <param name="sourceImage">The source image.</param>
-        /// <exception cref="System.Exception">Denoise effects supports up to 1920x1080 resolution.</exception>
-        public DenoiseEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
+        public DenoiseEffect(string modelsDir, VideoFrame sourceImage, float strength = 0.7f) 
+            : base(NvVFXFilterSelectors.NVVFX_FX_DENOISING, modelsDir, sourceImage)
 #endif
         {
             if (sourceImage.Width > 1920 || sourceImage.Height > 1080)

@@ -53,7 +53,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         public SuperResolutionEffect(string modelsDir, Mat sourceImage, SuperResolutionEffectMode mode = SuperResolutionEffectMode.LQSource, int newHeight = 1080)
             : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
 #else
-        public SuperResolutionEffect(string modelsDir, VideoFrame sourceImage) 
+        public SuperResolutionEffect(string modelsDir, VideoFrame sourceImage, SuperResolutionEffectMode mode = SuperResolutionEffectMode.LQSource, int newHeight = 1080) 
             : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
 #endif
         {

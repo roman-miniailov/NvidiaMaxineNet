@@ -115,7 +115,7 @@ namespace MainDemo
                 case 4:
                     {
                         var eff = new AIGSEffect(MODELS_DIR, _source.GetBaseFrame(), (AIGSEffectMode)cbAIGSMode.SelectedIndex);
-                        eff.BackgroundImage = @"c:\Samples\pics\5.jpg";
+                        eff.BackgroundImage = edAIGSBackground.Text;
 
                         _videoEffect = eff;
                         _videoEffect.Init(info.Width, info.Height);

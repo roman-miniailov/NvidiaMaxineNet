@@ -88,6 +88,9 @@
                     <ComboBoxItem>Background</ComboBoxItem>
                     <ComboBoxItem>Blur</ComboBoxItem>
                 </ComboBox>
+
+                <Label Margin="10,45,0,0" Foreground="White">Background image</Label>
+                <TextBox x:Name="edAIGSBackground" Margin="15,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="24">c:\Samples\pics\5.jpg</TextBox>
             </Grid>
         </Grid>
 
