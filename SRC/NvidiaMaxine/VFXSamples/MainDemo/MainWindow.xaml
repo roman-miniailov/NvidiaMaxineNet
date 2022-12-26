@@ -78,7 +78,16 @@
             </Grid>
 
             <Grid x:Name="gdAIGS" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Hidden">
-               
+                <Label Margin="10,0,0,0" Foreground="White">Mode</Label>
+                <ComboBox x:Name="cbAIGSMode" Margin="15,25,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" SelectedIndex="0">
+                    <ComboBoxItem>Matte</ComboBoxItem>
+                    <ComboBoxItem>Light</ComboBoxItem>
+                    <ComboBoxItem>Green</ComboBoxItem>
+                    <ComboBoxItem>White</ComboBoxItem>
+                    <ComboBoxItem>None</ComboBoxItem>
+                    <ComboBoxItem>Background</ComboBoxItem>
+                    <ComboBoxItem>Blur</ComboBoxItem>
+                </ComboBox>
             </Grid>
         </Grid>
 

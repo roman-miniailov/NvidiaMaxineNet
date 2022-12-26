@@ -52,6 +52,6 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <summary>
         /// The blur.
         /// </summary>
-        Blur
+        Blur,
     }
 }

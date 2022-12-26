@@ -27,20 +27,20 @@ namespace NvidiaMaxine.VideoEffects.Effects
 {
     /// <summary>
     /// AI Green Screen effect.
-    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />.
     /// </summary>
     /// <seealso cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
     public class AIGSEffect : BaseEffect
     {
-        private uint _maxInputWidth = 3840;
+        private readonly uint _maxInputWidth = 3840;
 
-        private uint _maxInputHeight = 2160;
+        private readonly uint _maxInputHeight = 2160;
 
-        private uint _maxNumberStreams = 1;
+        private readonly uint _maxNumberStreams = 1;
 
         private bool _cudaGraph;
 
-        private List<IntPtr> _stateArray = new List<IntPtr>();
+        private readonly List<IntPtr> _stateArray = new List<IntPtr>();
 
         private IntPtr _bgblurEff;
 
@@ -58,19 +58,27 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private NvCVImage _blurNvVFXImage;
 
-        private float _blurStrength = 0.5f;
+        private Mat _result;
 
         private long _count;
 
         private long _total;
 
-
-
-
         public uint Mode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the blur strength.
+        /// </summary>
+        public float BlurStrength { get; set; } = 0.5f;
+
+        /// <summary>
+        /// Gets or sets the effect mode.
+        /// </summary>
         public AIGSEffectMode EffectMode { get; set; } = AIGSEffectMode.Background;
 
+        /// <summary>
+        /// Gets or sets the background image.
+        /// </summary>
         public string BackgroundImage { get; set; }
 
         /// <summary>
@@ -78,20 +86,16 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// </summary>
         /// <param name="modelsDir">The models dir.</param>
         /// <param name="sourceImage">The source image.</param>
+        /// <param name="effectMode">The effect mode.</param>
 #if OPENCV
-        public AIGSEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
+        public AIGSEffect(string modelsDir, Mat sourceImage, AIGSEffectMode effectMode)
+            : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
 #else
-        public AIGSEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
+        public AIGSEffect(string modelsDir, VideoFrame sourceImage, AIGSEffectMode effectMode) 
+            : base(NvVFXFilterSelectors.NVVFX_FX_GREEN_SCREEN, modelsDir, sourceImage)
 #endif
         {
-
-            //const char* cstr;  // TODO: This is not necessary
-            //vfxErr = NvVFX_GetString(_eff, NVVFX_INFO, &cstr);
-            //if (vfxErr != NVCV_SUCCESS)
-            //{
-            //    std::cerr << "AIGS modes not found \n" << std::endl;
-            //    return vfxErr;
-            //}
+            EffectMode = effectMode;
 
             // Choose one mode -> set() -> Load() -> Run()
             CheckResult(NvVFXAPI.NvVFX_SetU32(_handle, NvVFXParameterSelectors.NVVFX_MODE, Mode));
@@ -302,11 +306,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <param name="mask">The mask.</param>
         /// <param name="alpha">The alpha.</param>
         /// <param name="result">The result.</param>
-        private static void Overlay(Mat image, Mat mask, float alpha, Mat result)
+        private static void Overlay(Mat image, Mat mask, float alpha, out Mat result)
         {
             Mat maskClr = new Mat();
             Cv2.CvtColor(mask, maskClr, ColorConversionCodes.GRAY2BGR);
             result = image * (1.0f - alpha) + maskClr * alpha;
+            maskClr.Dispose();
         }
 
         /// <summary>
@@ -324,6 +329,10 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             _dstImg = new Mat(_srcImg.Size(), MatType.CV_8UC1);
 
+            _result = new Mat();
+            _result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);  // Make sure the result is allocated. TODO: allocate outsifde of the loop?
+            CheckNull(_result.Data, NvCVStatus.NVCV_ERR_MEMORY);
+            
             _count = 0;
             _total = 0;
 
@@ -339,8 +348,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 #else
         public override VideoFrame Process()
 #endif
-        {
-            Mat result = new Mat();
+        {           
             //CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, _stream, _tmpVFX));
             //CheckResult(NvVFXAPI.NvVFX_Run(_handle, 0));
             //CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstGpuBuf, _dstVFX, 255.0f, _stream, _tmpVFX));
@@ -385,14 +393,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             CheckResult(NvCVImageAPI.NvCVImage_Transfer(_dstNvVFXImage, _dstVFX, 1.0f, _stream, IntPtr.Zero));
 
             NvCVImage matVFX = new NvCVImage();
-
-            result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);  // Make sure the result is allocated. TODO: allocate outsifde of the loop?
-            CheckNull(result.Data, NvCVStatus.NVCV_ERR_MEMORY);
-            result.SetTo(Scalar.All(0));  // TODO: This may no longer be necessary since we no longer coerce to 16:9
+                        
+            _result.SetTo(Scalar.All(0));  // TODO: This may no longer be necessary since we no longer coerce to 16:9
             switch (EffectMode)
             {
                 case AIGSEffectMode.None:
-                    _srcImg.CopyTo(result);
+                    _srcImg.CopyTo(_result);
                     break;
 
                 case AIGSEffectMode.Background:
@@ -412,7 +418,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
                         NvCVImage bgVFX = new NvCVImage();
                         NVWrapperForCVMat(_resizedCroppedBgImg, ref bgVFX);
-                        NVWrapperForCVMat(result, ref matVFX);
+                        NVWrapperForCVMat(_result, ref matVFX);
                         NvCVImageAPI.NvCVImage_Composite(_srcVFX, bgVFX, _dstVFX, out matVFX, _stream);
                     }
 
@@ -421,7 +427,9 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 case AIGSEffectMode.Light:
                     //if (inFile)
                     //{
-                        Overlay(_srcImg, _dstImg, 0.5f, result);
+                    Overlay(_srcImg, _dstImg, 0.5f, out var result);
+                    result.CopyTo(_result);
+                    result.Dispose();
                     //}
                     //else
                     //{  
@@ -436,7 +444,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 case AIGSEffectMode.Green:
                     {
                         int bgColor = System.Drawing.Color.Green.ToArgb();
-                        NVWrapperForCVMat(result, ref matVFX);
+                        NVWrapperForCVMat(_result, ref matVFX);
                         NvCVImageAPI.NvCVImage_CompositeOverConstant(_srcVFX, _dstVFX, ref bgColor, ref matVFX, _stream);
                     }
 
@@ -445,32 +453,32 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 case AIGSEffectMode.White:
                     {
                         int bgColor = System.Drawing.Color.White.ToArgb();
-                        NVWrapperForCVMat(result, ref matVFX);
+                        NVWrapperForCVMat(_result, ref matVFX);
                         NvCVImageAPI.NvCVImage_CompositeOverConstant(_srcVFX, _dstVFX, ref bgColor, ref matVFX, _stream);
                     }
 
                     break;
 
                 case AIGSEffectMode.Matte:
-                    Cv2.CvtColor(_dstImg, result, ColorConversionCodes.GRAY2BGR);
+                    Cv2.CvtColor(_dstImg, _result, ColorConversionCodes.GRAY2BGR);
                     break;
 
                 case AIGSEffectMode.Blur:
 
-                    CheckResult(NvVFXAPI.NvVFX_SetF32(_bgblurEff, NvVFXParameterSelectors.NVVFX_STRENGTH, _blurStrength));
+                    CheckResult(NvVFXAPI.NvVFX_SetF32(_bgblurEff, NvVFXParameterSelectors.NVVFX_STRENGTH, BlurStrength));
                     CheckResult(NvVFXAPI.NvVFX_SetImage(_bgblurEff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE_0, ref _srcNvVFXImage));
                     CheckResult(NvVFXAPI.NvVFX_SetImage(_bgblurEff, NvVFXParameterSelectors.NVVFX_INPUT_IMAGE_1, ref _dstNvVFXImage));
                     CheckResult(NvVFXAPI.NvVFX_SetImage(_bgblurEff, NvVFXParameterSelectors.NVVFX_OUTPUT_IMAGE, ref _blurNvVFXImage));
                     CheckResult(NvVFXAPI.NvVFX_Load(_bgblurEff));
                     CheckResult(NvVFXAPI.NvVFX_Run(_bgblurEff, 0));
 
-                    NVWrapperForCVMat(result, ref matVFX);
+                    NVWrapperForCVMat(_result, ref matVFX);
                     CheckResult(NvCVImageAPI.NvCVImage_Transfer(_blurNvVFXImage, matVFX, 1.0f, _stream, IntPtr.Zero));
 
                     break;
             }
 
-            return result;
+            return _result;
 
             //if (outFile)
             //{
