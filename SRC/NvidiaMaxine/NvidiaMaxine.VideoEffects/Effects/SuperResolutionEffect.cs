@@ -25,7 +25,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 {
     /// <summary>
     /// Super resolution effect.
-    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />.
     /// </summary>
     /// <seealso cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
     public class SuperResolutionEffect : BaseEffect
@@ -34,25 +34,31 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// Gets or sets the mode.
         /// </summary>
         /// <value>The mode.</value>
-        public SuperResolutionEffectMode Mode { get; set; } = SuperResolutionEffectMode.LQSource;
+        public SuperResolutionEffectMode Mode { get; set; }
 
         /// <summary>
-        /// New height. Width will be calculated automatically.
+        /// Gets or sets the new height. Width will be calculated automatically.
         /// </summary>
         /// <value>The new height.</value>
-        public int NewHeight { get; set; } = 1080;
+        public int NewHeight { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SuperResolutionEffect" /> class.
         /// </summary>
-        /// <param name="modelsDir">The models dir.</param>
+        /// <param name="modelsDir">The models directory.</param>
+        /// <param name="mode">THe mode.</param>
+        /// <param name="newHeight">The new height.</param>
         /// <param name="sourceImage">The source image.</param>
 #if OPENCV
-        public SuperResolutionEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
+        public SuperResolutionEffect(string modelsDir, Mat sourceImage, SuperResolutionEffectMode mode = SuperResolutionEffectMode.LQSource, int newHeight = 1080)
+            : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
 #else
-        public SuperResolutionEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
+        public SuperResolutionEffect(string modelsDir, VideoFrame sourceImage) 
+            : base(NvVFXFilterSelectors.NVVFX_FX_SUPER_RES, modelsDir, sourceImage)
 #endif
         {
+            Mode = mode;
+            NewHeight = newHeight;
         }
 
         /// <summary>
@@ -92,12 +98,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             int dstWidth = (int)Math.Round((double)_srcImg.Width * (double)NewHeight / (double)_srcImg.Height);
 
 #if OPENCV
-            _dstImg = new Mat();            
+            _dstImg = new Mat();
             _dstImg.Create(NewHeight, dstWidth, _srcImg.Type());
 #else
             _dstImg = new VideoFrame(dstWidth, NewHeight, _srcImg.PixelFormat, _srcImg.ComponentType);
 #endif
-            
+
             if (_dstImg.Data == IntPtr.Zero)
             {
                 return NvCVStatus.NVCV_ERR_MEMORY;
@@ -105,16 +111,21 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
             // src GPU
             _srcGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Width, (uint)_srcImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(
+                ref _srcGpuBuf, (uint)_srcImg.Width, (uint)_srcImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
-            //dst GPU
+            // dst GPU
             _dstGpuBuf = new NvCVImage();
-            CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Width, (uint)_dstImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
+            CheckResult(NvCVImageAPI.NvCVImage_Alloc(
+                ref _dstGpuBuf, (uint)_dstImg.Width, (uint)_dstImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_F32, NvCVLayout.NVCV_PLANAR, NvCVMemSpace.NVCV_GPU, 1));
 
             CheckResult(CheckScaleIsotropy(_srcGpuBuf, _dstGpuBuf));
 
-            NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
-            NVWrapperForCVMat(_dstImg, ref _dstVFX);      // _dstVFX is an alias for _dstImg
+            // _srcVFX is an alias for _srcImg
+            NVWrapperForCVMat(_srcImg, ref _srcVFX);
+
+            // _dstVFX is an alias for _dstImg
+            NVWrapperForCVMat(_dstImg, ref _dstVFX);
 
             CheckResult(AllocTempBuffers());
 
@@ -134,6 +145,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
                 Debug.WriteLine($"{src.Width}x{src.Height} --> {dst.Width}x{dst.Height}: different scale for width and height is not supported");
                 return NvCVStatus.NVCV_ERR_RESOLUTION;
             }
+
             return NvCVStatus.NVCV_SUCCESS;
         }
     }

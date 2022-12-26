@@ -1,13 +1,13 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.VideoEffects
-// Author           : roman
+// Author           : Roman
 // Created          : 12-21-2022
 //
-// Last Modified By : roman
-// Last Modified On : 12-21-2022
+// Last Modified By : Roman
+// Last Modified On : 12-26-2022
 // ***********************************************************************
-// <copyright file="ArtifactReductionEffect.cs" company="NvidiaMaxine.VideoEffects">
-//     Copyright (c) . All rights reserved.
+// <copyright file="ArtifactReductionEffect.cs" company="Roman Miniailov">
+//     2022-2023
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
@@ -22,7 +22,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 {
     /// <summary>
     /// Artifact Reduction effect.
-    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />.
     /// </summary>
     /// <seealso cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
     public class ArtifactReductionEffect : BaseEffect
@@ -31,21 +31,24 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// Gets or sets the mode.
         /// </summary>
         /// <value>The mode.</value>
-        public ArtifactReductionEffectMode Mode { get; set; } = ArtifactReductionEffectMode.LowBitrate;
-        
+        public ArtifactReductionEffectMode Mode { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactReductionEffect"/> class.
         /// </summary>
-        /// <param name="modelsDir">The models dir.</param>
+        /// <param name="modelsDir">The models directory.</param>
+        /// <param name="mode">The mode.</param>
         /// <param name="sourceImage">The source image.</param>
 #if OPENCV
-        public ArtifactReductionEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
+        public ArtifactReductionEffect(string modelsDir, Mat sourceImage, ArtifactReductionEffectMode mode = ArtifactReductionEffectMode.LowBitrate)
+            : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
 #else
-        public ArtifactReductionEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
+        public ArtifactReductionEffect(string modelsDir, VideoFrame sourceImage) 
+            : base(NvVFXFilterSelectors.NVVFX_FX_ARTIFACT_REDUCTION, modelsDir, sourceImage)
 #endif
         {
+            Mode = mode;
         }
-
 
         /// <summary>
         /// Applies the effect.

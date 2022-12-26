@@ -1,10 +1,10 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.VideoEffects
-// Author           : Roman Miniailov
+// Author           : Roman
 // Created          : 12-21-2022
 //
-// Last Modified By : Roman Miniailov
-// Last Modified On : 12-22-2022
+// Last Modified By : Roman
+// Last Modified On : 12-23-2022
 // ***********************************************************************
 // <copyright file="UpscaleEffect.cs" company="Roman Miniailov">
 //     2022-2023
@@ -24,16 +24,16 @@ namespace NvidiaMaxine.VideoEffects.Effects
 {
     /// <summary>
     /// Upscale video effect.
-    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
+    /// Implements the <see cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />.
     /// </summary>
     /// <seealso cref="NvidiaMaxine.VideoEffects.Effects.BaseEffect" />
     public class UpscaleEffect : BaseEffect
     {
         /// <summary>
-        /// New height. Width will be calculated automatically.
+        /// Gets or sets the new height. Width will be calculated automatically.
         /// </summary>
         /// <value>The new height.</value>
-        public int NewHeight { get; set; } = 1080;
+        public int NewHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the strength.
@@ -41,19 +41,25 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// Strength 1 implies the maximum enhancement.
         /// </summary>
         /// <value>The strength.</value>
-        public float Strength { get; set; } = 0.4f;
+        public float Strength { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpscaleEffect" /> class.
         /// </summary>
-        /// <param name="modelsDir">The models dir.</param>
+        /// <param name="modelsDir">The models directory.</param>
+        /// <param name="strength">The strength.</param>
+        /// <param name="newHeight">The new height.</param>
         /// <param name="sourceImage">The source image.</param>
 #if OPENCV
-        public UpscaleEffect(string modelsDir, Mat sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
+        public UpscaleEffect(string modelsDir, Mat sourceImage, float strength = 0.4f, int newHeight = 1080)
+            : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
 #else
-        public UpscaleEffect(string modelsDir, VideoFrame sourceImage) : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
+        public UpscaleEffect(string modelsDir, VideoFrame sourceImage) 
+            : base(NvVFXFilterSelectors.NVVFX_FX_SR_UPSCALE, modelsDir, sourceImage)
 #endif
         {
+            Strength = strength;
+            NewHeight = newHeight;
         }
 
         /// <summary>
@@ -107,14 +113,15 @@ namespace NvidiaMaxine.VideoEffects.Effects
             _srcGpuBuf = new NvCVImage();
             CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _srcGpuBuf, (uint)_srcImg.Width, (uint)_srcImg.Height, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
 
-            //dst GPU
+            // dst GPU
             _dstGpuBuf = new NvCVImage();
             CheckResult(NvCVImageAPI.NvCVImage_Alloc(ref _dstGpuBuf, (uint)_dstImg.Width, (uint)_dstImg.Height, NvCVImagePixelFormat.NVCV_RGBA, NvCVImageComponentType.NVCV_U8, NvCVLayout.NVCV_INTERLEAVED, NvCVMemSpace.NVCV_GPU, 32));
 
-            //CheckResult(CheckScaleIsotropy(_srcGpuBuf, _dstGpuBuf));
+            // _srcVFX is an alias for _srcImg
+            NVWrapperForCVMat(_srcImg, ref _srcVFX);
 
-            NVWrapperForCVMat(_srcImg, ref _srcVFX);      // _srcVFX is an alias for _srcImg
-            NVWrapperForCVMat(_dstImg, ref _dstVFX);      // _dstVFX is an alias for _dstImg
+            // _dstVFX is an alias for _dstImg
+            NVWrapperForCVMat(_dstImg, ref _dstVFX);
 
             CheckResult(AllocTempBuffers());
 

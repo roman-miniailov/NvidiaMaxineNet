@@ -22,15 +22,7 @@ namespace MainDemo
 
         private FileOutput _output;
 
-        private DenoiseEffect _denoiseEffect;
-
-        private ArtifactReductionEffect _artifactReductionEffect;
-
-        private SuperResolutionEffect _superResolutionEffect;
-
-        private UpscaleEffect _upscaleEffect;
-
-        private BaseEffect _currentEffect;
+        private BaseEffect _videoEffect;
 
         private bool _stopFlag = false;
 
@@ -90,31 +82,49 @@ namespace MainDemo
             _output.Init(edOutputFilename.Text, info.Resolution, info.FrameRate);
 
             // add effect
-            if (rbEffDenoise.IsChecked == true)
+            switch (cbEffect.SelectedIndex)
             {
-                _denoiseEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame());
-                _denoiseEffect.Init(info.Width, info.Height);
-                _currentEffect = _denoiseEffect;
-            }
-            else if (rbEffArtReduction.IsChecked == true)
-            {
-                _artifactReductionEffect = new ArtifactReductionEffect(MODELS_DIR, _source.GetBaseFrame());
-                _artifactReductionEffect.Init(info.Width, info.Height);
-                _currentEffect = _artifactReductionEffect;
-            }
-            else if (rbEffSuperRes.IsChecked == true)
-            {
-                _superResolutionEffect = new SuperResolutionEffect(MODELS_DIR, _source.GetBaseFrame());
-                _superResolutionEffect.Init(info.Width, info.Height);
-                _currentEffect = _superResolutionEffect;
-            }
-            else if (rbEffUpscale.IsChecked == true)
-            {
-                _upscaleEffect = new UpscaleEffect(MODELS_DIR, _source.GetBaseFrame());
-                _upscaleEffect.Init(info.Width, info.Height);
-                _currentEffect = _upscaleEffect;
-            }                       
+                case 0:
+                    {
+                        _videoEffect = new DenoiseEffect(MODELS_DIR, _source.GetBaseFrame(), (float)(slDenoiseStrength.Value / 10.0));
+                        _videoEffect.Init(info.Width, info.Height);
+                    }
+                    
+                    break;
+                case 1:
+                    {
+                        _videoEffect = new ArtifactReductionEffect(MODELS_DIR, _source.GetBaseFrame(), (ArtifactReductionEffectMode)cbArtifactReductionMode.SelectedIndex);
+                        _videoEffect.Init(info.Width, info.Height);
+                    }
+                    
+                    break;
+                case 2:
+                    {
+                        _videoEffect = new SuperResolutionEffect(MODELS_DIR, _source.GetBaseFrame(), (SuperResolutionEffectMode)cbSuperResolutionMode.SelectedIndex, Convert.ToInt32(edSuperResolutionHeight.Text));
+                        _videoEffect.Init(info.Width, info.Height);
+                    }
+                    
+                    break;
+                case 3:
+                    {
+                        _videoEffect = new UpscaleEffect(MODELS_DIR, _source.GetBaseFrame(), (float)(slUpscaleStrength.Value / 10.0), Convert.ToInt32(edUpscaleHeight.Text));
+                        _videoEffect.Init(info.Width, info.Height);
+                    }
+                    
+                    break;
+                case 4:
+                    {
+                        var eff = new AIGSEffect(MODELS_DIR, _source.GetBaseFrame());
+                        eff.BackgroundImage = @"c:\Samples\pics\5.jpg";
 
+                        _videoEffect = eff;
+                        _videoEffect.Init(info.Width, info.Height);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
             // start
             _source.Start();
         }
@@ -130,7 +140,7 @@ namespace MainDemo
         {
             //OpenCvSharp.Cv2.ImWrite("c:\\vf\\x\\orig.jpg", e.Frame);
 
-            var processedFrame = _currentEffect.Process();
+            var processedFrame = _videoEffect.Process();
             _output.WriteFrame(processedFrame);
 
             //OpenCvSharp.Cv2.ImWrite("c:\\vf\\x\\proc.jpg", processedFrame);
@@ -180,19 +190,8 @@ namespace MainDemo
             _output?.Dispose();
             _output = null;
 
-            _denoiseEffect?.Dispose();
-            _denoiseEffect = null;
-
-            _artifactReductionEffect?.Dispose();
-            _artifactReductionEffect = null;
-
-            _upscaleEffect?.Dispose();
-            _upscaleEffect = null;
-
-            _superResolutionEffect?.Dispose();
-            _superResolutionEffect = null;
-
-            _currentEffect = null;
+            _videoEffect?.Dispose();
+            _videoEffect = null;
 
             Dispatcher.Invoke(() =>
             {
@@ -247,6 +246,66 @@ namespace MainDemo
             if (cbCamera.Items.Count > 0)
             {
                 cbCamera.SelectedIndex = 0;
+            }
+        }
+
+        private void cbEffect_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (gdDenoise == null)
+            {
+                return;
+            }
+
+            switch (cbEffect.SelectedIndex)
+            {
+                case 0:
+                    {
+                        gdDenoise.Visibility = Visibility.Visible;
+                        gdArtifactReduction.Visibility = Visibility.Collapsed;
+                        gdSuperResolution.Visibility = Visibility.Collapsed;
+                        gdUpscale.Visibility = Visibility.Collapsed;
+                        gdAIGS.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case 1:
+                    {
+                        gdDenoise.Visibility = Visibility.Collapsed;
+                        gdArtifactReduction.Visibility = Visibility.Visible;
+                        gdSuperResolution.Visibility = Visibility.Collapsed;
+                        gdUpscale.Visibility = Visibility.Collapsed;
+                        gdAIGS.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case 2:
+                    {
+                        gdDenoise.Visibility = Visibility.Collapsed;
+                        gdArtifactReduction.Visibility = Visibility.Collapsed;
+                        gdSuperResolution.Visibility = Visibility.Visible;
+                        gdUpscale.Visibility = Visibility.Collapsed;
+                        gdAIGS.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case 3:
+                    {
+                        gdDenoise.Visibility = Visibility.Collapsed;
+                        gdArtifactReduction.Visibility = Visibility.Collapsed;
+                        gdSuperResolution.Visibility = Visibility.Collapsed;
+                        gdUpscale.Visibility = Visibility.Visible;
+                        gdAIGS.Visibility = Visibility.Collapsed;
+                    }
+                    break;
+                case 4:
+                    {
+                        gdDenoise.Visibility = Visibility.Collapsed;
+                        gdArtifactReduction.Visibility = Visibility.Collapsed;
+                        gdSuperResolution.Visibility = Visibility.Collapsed;
+                        gdUpscale.Visibility = Visibility.Collapsed;
+                        gdAIGS.Visibility = Visibility.Visible;
+                    }
+                    break;
+                    
+                default:
+                    break;
             }
         }
     }

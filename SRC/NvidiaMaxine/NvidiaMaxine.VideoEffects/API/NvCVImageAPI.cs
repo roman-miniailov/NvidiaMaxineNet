@@ -301,6 +301,14 @@ namespace NvidiaMaxine.VideoEffects.API
              IntPtr stream,
              NvCVImage tmp);
 
+        [DllImport(NvCVImageLib, CallingConvention = CallingConvention.Cdecl)]
+        public static extern NvCVStatus NvCVImage_Transfer(
+            NvCVImage src,
+            NvCVImage dst,
+            float scale,
+            IntPtr stream,
+            IntPtr tmp);
+
         /// <summary>
         /// Transfer a rectangular portion of an image. See NvCVImage_Transfer() for the pixel format combinations that are implemented.
         /// </summary>
@@ -531,7 +539,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public static extern NvCVStatus NvCVImage_CompositeOverConstant(
             NvCVImage src,
             NvCVImage mat,
-            IntPtr bgColor,
+            ref int bgColor,
             ref NvCVImage dst,
             IntPtr stream);
 

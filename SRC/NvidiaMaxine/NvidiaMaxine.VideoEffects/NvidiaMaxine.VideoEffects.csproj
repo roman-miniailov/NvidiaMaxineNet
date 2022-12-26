@@ -15,30 +15,32 @@
 		<Copyright>2022-2023</Copyright>
 		<PackageTags>nvidia, maxine, gpu, ai, super resolution</PackageTags>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<AssemblyVersion>1.0.2.0</AssemblyVersion>
+		<AssemblyVersion>1.0.3.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/roman-miniailov/NvidiaMaxineNet</PackageProjectUrl>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 
 	<PropertyGroup>
-	  <DefineConstants>$(DefineConstants);OPENCV</DefineConstants>
+		<DefineConstants>$(DefineConstants);OPENCV</DefineConstants>
+		<NoWarn>1701;1702;SA1101;S112;SA1129</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Folder Include="CUDA\" />
+		<Folder Include="CUDA\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\..\LICENSE">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\..\..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -49,4 +51,20 @@
 		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.6.0.20220608" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="8.50.0.58025">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	
 </Project>

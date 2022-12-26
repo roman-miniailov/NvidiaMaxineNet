@@ -1,8 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ***********************************************************************
+// Assembly         : NvidiaMaxine.VideoEffects
+// Author           : Roman
+// Created          : 12-21-2022
+//
+// Last Modified By : Roman
+// Last Modified On : 12-21-2022
+// ***********************************************************************
+// <copyright file="ArtifactReductionEffectMode.cs" company="Roman Miniailov">
+//     2022-2023
+// </copyright>
+// <summary></summary>
+// ***********************************************************************
 
 namespace NvidiaMaxine.VideoEffects.Effects
 {
@@ -19,6 +27,6 @@ namespace NvidiaMaxine.VideoEffects.Effects
         /// <summary>
         /// Mode 1 is better suited for lower bitrate videos.
         /// </summary>
-        LowBitrate
+        LowBitrate,
     }
 }

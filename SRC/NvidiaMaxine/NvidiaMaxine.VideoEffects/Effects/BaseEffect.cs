@@ -69,6 +69,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
             CreateEffect();
         }
 
+        /// <summary>
+        /// Checks the result.
+        /// </summary>
+        /// <param name="err">The error.</param>
+        /// <exception cref="System.Exception">NvCVStatus exception. {err}</exception>
         protected void CheckResult(NvCVStatus err)
         {
             if (err != NvCVStatus.NVCV_SUCCESS)
@@ -77,6 +82,34 @@ namespace NvidiaMaxine.VideoEffects.Effects
             }
         }
 
+        /// <summary>
+        /// Checks the result.
+        /// </summary>
+        /// <param name="err">The error.</param>
+        /// <param name="data">The data.</param>
+        /// <exception cref="System.Exception">NvCVStatus exception. {err}</exception>
+        protected void CheckNull(IntPtr data, NvCVStatus err)
+        {
+            if (data == IntPtr.Zero)
+            {
+                throw new Exception($"NvCVStatus exception. {err}");
+            }
+        }
+
+        /// <summary>
+        /// Checks the result.
+        /// </summary>
+        /// <param name="err">The error.</param>
+        /// <param name="data">The data.</param>
+        /// <exception cref="System.Exception">NvCVStatus exception. {err}</exception>
+        protected void CheckNull(object data, NvCVStatus err)
+        {
+            if (data == null)
+            {
+                throw new Exception($"NvCVStatus exception. {err}");
+            }
+        }
+        
         private NvCVStatus CreateEffect()
         {
             NvCVStatus vfxErr;
@@ -92,7 +125,10 @@ namespace NvidiaMaxine.VideoEffects.Effects
             return vfxErr;
         }
 
-        private void DestroyEffect()
+        /// <summary>
+        /// Destroys the effect.
+        /// </summary>
+        protected virtual void DestroyEffect()
         {
             if (_handle != IntPtr.Zero)
             {
@@ -124,6 +160,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
         }
 
 #if OPENCV
+        /// <summary>
+        /// NVWrapperForCVMat.
+        /// </summary>
+        /// <param name="cvIm">OpenCV Mat.</param>
+        /// <param name="nvcvIm">NvCVImage.</param>
         protected static void NVWrapperForCVMat(Mat cvIm, ref NvCVImage nvcvIm)
         {
             NvCVImagePixelFormat[] nvFormat = new[] { NvCVImagePixelFormat.NVCV_FORMAT_UNKNOWN, NvCVImagePixelFormat.NVCV_Y, NvCVImagePixelFormat.NVCV_YA, NvCVImagePixelFormat.NVCV_BGR, NvCVImagePixelFormat.NVCV_BGRA };
@@ -148,6 +189,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
             nvcvIm.Reserved2 = 0;
         }
 #else
+        /// <summary>
+        /// NVWrapperForCVMat.
+        /// </summary>
+        /// <param name="cvIm">VideoFrame.</param>
+        /// <param name="nvcvIm">NvCVImage.</param>
         protected static void NVWrapperForCVMat(VideoFrame cvIm, ref NvCVImage nvcvIm)
         {
             nvcvIm.Pixels = cvIm.Data;
@@ -169,10 +215,13 @@ namespace NvidiaMaxine.VideoEffects.Effects
         }
 #endif
 
-        // Allocate one temp buffer to be used for input and output. Reshaping of the temp buffer in NvCVImage_Transfer() is done automatically,
-        // and is very low overhead. We expect the destination to be largest, so we allocate that first to minimize reallocs probablistically.
-        // Then we Realloc for the source to get the union of the two.
-        // This could alternately be done at runtime by feeding in an empty temp NvCVImage, but there are advantages to allocating all memory at load time.
+        /// <summary>
+        /// Allocate one temp buffer to be used for input and output. Reshaping of the temp buffer in NvCVImage_Transfer() is done automatically,
+        /// and is very low overhead. We expect the destination to be largest, so we allocate that first to minimize reallocs probablistically.
+        /// Then we Realloc for the source to get the union of the two.
+        /// This could alternately be done at runtime by feeding in an empty temp NvCVImage, but there are advantages to allocating all memory at load time.
+        /// </summary>
+        /// <returns>NvCVStatus.</returns>
         protected virtual NvCVStatus AllocTempBuffers()
         {
             NvCVStatus vfxErr;
@@ -185,11 +234,20 @@ namespace NvidiaMaxine.VideoEffects.Effects
             return vfxErr;
         }
 
+        /// <summary>
+        /// Applies the effect.
+        /// </summary>
         protected virtual void ApplyEffect()
         {
         }
 
-        public NvCVStatus Init(int width, int height)
+        /// <summary>
+        /// Initializes.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <returns>NvCVStatus.</returns>
+        public virtual NvCVStatus Init(int width, int height)
         {
             _state = IntPtr.Zero;
             _stream = IntPtr.Zero;
@@ -230,6 +288,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
             return NvCVStatus.NVCV_SUCCESS;
         }
 
+        /// <summary>
+        /// Allocs the buffers.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <returns>NvCVStatus.</returns>
         protected virtual NvCVStatus AllocBuffers(int width, int height)
         {
             NvCVStatus vfxErr = NvCVStatus.NVCV_SUCCESS;
@@ -288,9 +352,9 @@ namespace NvidiaMaxine.VideoEffects.Effects
         }
 
 #if OPENCV
-        public Mat Process()
+        public virtual Mat Process()
 #else
-        public VideoFrame Process()
+        public virtual VideoFrame Process()
 #endif
         {
             CheckResult(NvCVImageAPI.NvCVImage_Transfer(_srcVFX, _srcGpuBuf, 1.0f / 255.0f, _stream, _tmpVFX));

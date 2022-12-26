@@ -153,7 +153,7 @@ namespace NvidiaMaxine.VideoEffects.API
         public static extern NvCVStatus NvVFX_SetStateObjectHandleArray(
             IntPtr effect,
             string paramName,
-            /* NvVFX_StateObjectHandle* */ object handle);
+            /* NvVFX_StateObjectHandle* */ IntPtr handle);
 
         /// <summary>
         /// Set the value of the selected parameter.
@@ -424,7 +424,7 @@ namespace NvidiaMaxine.VideoEffects.API
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_AllocateState(IntPtr effect, out NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_AllocateState(IntPtr effect, out IntPtr handle);
 
         /// <summary>
         /// Deallocate the state object handle for stateful feature.
@@ -437,7 +437,7 @@ namespace NvidiaMaxine.VideoEffects.API
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_DeallocateState(IntPtr effect, NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_DeallocateState(IntPtr effect, IntPtr handle);
 
         /// <summary>
         /// Reset the state object handle for stateful feature.
@@ -450,7 +450,7 @@ namespace NvidiaMaxine.VideoEffects.API
         /// NVCV_ERR_EFFECT if an invalid effect handle was supplied.
         /// </returns>
         [DllImport(NvVideoEffectsLib, CallingConvention = CallingConvention.Cdecl)]
-        public static extern NvCVStatus NvVFX_ResetState(IntPtr effect, NvVFXStateObjectHandle handle);
+        public static extern NvCVStatus NvVFX_ResetState(IntPtr effect, IntPtr handle);
 
 
     }

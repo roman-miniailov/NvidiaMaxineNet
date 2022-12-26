@@ -37,17 +37,49 @@
         <Grid Grid.Row="1" Grid.Column="0">
             <Label Foreground="White" Margin="10,5,0,10" FontWeight="Bold"  HorizontalAlignment="Center" VerticalAlignment="Top">EFFECTS</Label>
 
-            <Grid Margin="0,24,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <ComboBox x:Name="cbEffect" Margin="10,35,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0" Height="24" Width="250" SelectionChanged="cbEffect_SelectionChanged">
+                <ComboBoxItem>Denoise</ComboBoxItem>
+                <ComboBoxItem>Artifact Reduction</ComboBoxItem>
+                <ComboBoxItem>Upscale</ComboBoxItem>
+                <ComboBoxItem>Super Resolution</ComboBoxItem>
+                <ComboBoxItem>AI Green Screen</ComboBoxItem>
+            </ComboBox>
 
-                <RadioButton Grid.Column="0" x:Name="rbEffDenoise" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsChecked="true" Foreground="White">Denoise</RadioButton>
-                <RadioButton Grid.Column="1" x:Name="rbEffArtReduction" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Foreground="White">Artifact Reduction</RadioButton>
-                <RadioButton Grid.Column="0" x:Name="rbEffUpscale" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Foreground="White">Upscale</RadioButton>
-                <RadioButton Grid.Column="1" x:Name="rbEffSuperRes" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Foreground="White">Super Resolution</RadioButton>
-            </Grid>            
+            <Grid x:Name="gdDenoise" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Hidden">
+                <Label Margin="10,0,0,0" Foreground="White">Strength</Label>
+                <Slider x:Name="slDenoiseStrength" Margin="10,25,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Minimum="0" Maximum="10" Value="7"></Slider>
+            </Grid>
+
+            <Grid x:Name="gdArtifactReduction" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Hidden">
+                <Label Margin="10,0,0,0" Foreground="White">Mode</Label>
+                <ComboBox x:Name="cbArtifactReductionMode" Margin="15,25,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" SelectedIndex="0">
+                    <ComboBoxItem>High bitrate</ComboBoxItem>
+                    <ComboBoxItem>Low bitrate</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+
+            <Grid x:Name="gdUpscale" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Hidden">
+                <Label Margin="10,0,0,0" Foreground="White">Strength</Label>
+                <Slider x:Name="slUpscaleStrength" Margin="10,25,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Minimum="0" Maximum="10" Value="7"></Slider>
+
+                <Label Margin="10,45,0,0" Foreground="White">New height</Label>
+                <TextBox x:Name="edUpscaleHeight" Margin="15,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Height="24">1080</TextBox>
+            </Grid>
+
+            <Grid x:Name="gdSuperResolution" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Label Margin="10,0,0,0" Foreground="White">Mode</Label>
+                <ComboBox x:Name="cbSuperResolutionMode" Margin="15,25,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" SelectedIndex="0">
+                    <ComboBoxItem>HQ source</ComboBoxItem>
+                    <ComboBoxItem>LQ source</ComboBoxItem>
+                </ComboBox>
+
+                <Label Margin="10,45,0,0" Foreground="White">New height</Label>
+                <TextBox x:Name="edSuperResolutionHeight" Margin="15,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Height="24">1080</TextBox>
+            </Grid>
+
+            <Grid x:Name="gdAIGS" Margin="0,65,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Hidden">
+               
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="0">
