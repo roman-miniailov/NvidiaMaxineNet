@@ -22,11 +22,7 @@ using System.Runtime.InteropServices;
 
 #if OPENCV
 using OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
+
 #endif
 
 namespace NvidiaMaxine.VideoEffects.Effects
@@ -44,7 +40,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private readonly uint _maxNumberStreams = 1;
 
-        private bool _cudaGraph;
+        private readonly bool _cudaGraph = false;
 
         private readonly List<IntPtr> _stateArray = new List<IntPtr>();
 
@@ -52,13 +48,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
 
         private IntPtr _batchOfStates;
 
-        private uint _modelBatch;
-
 #if OPENCV
         private Mat _bgImg;
 
         private Mat _resizedCroppedBgImg;
-        
+
         private Mat _result;
 #else
         private VideoFrame _bgImg;
@@ -138,9 +132,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
         private void CreateBackgroundBlurEffect()
         {
             // Create Background blur effect
-
             CheckResult(NvVFXAPI.NvVFX_CreateEffect(NvVFXFilterSelectors.NVVFX_FX_BGBLUR, out _bgblurEff));
-            //CheckResult(NvVFXAPI.NvVFX_GetString(_bgblurEff, NvVFXParameterSelectors.NVVFX_INFO, cstr));
             CheckResult(NvVFXAPI.NvVFX_SetCudaStream(_bgblurEff, NvVFXParameterSelectors.NVVFX_CUDA_STREAM, _stream));
         }
 
@@ -199,22 +191,23 @@ namespace NvidiaMaxine.VideoEffects.Effects
 #else
             _bgImg = VideoFrame.LoadFromFile(BackgroundImage);
 #endif
-            
+
             if (_bgImg.Data == IntPtr.Zero)
             {
                 throw new Exception("Background image not loaded");
             }
             else
             {
-#if OPENCV         
+#if OPENCV
                 // Find the scale to resize background such that image can fit into background
                 float scale = (float)height / (float)_bgImg.Height;
                 if ((scale * _bgImg.Width) < (float)width)
                 {
                     scale = (float)width / (float)_bgImg.Width;
                 }
+
                 var resizedBg = new Mat();
-                Cv2.Resize(_bgImg, resizedBg, new Size(), scale, scale, InterpolationFlags.Area);
+                Cv2.Resize(_bgImg, resizedBg, new OpenCvSharp.Size(), scale, scale, InterpolationFlags.Area);
 #else
                 var resizedBg = _bgImg.ResizeImage24(width, height);
 #endif
@@ -243,12 +236,10 @@ namespace NvidiaMaxine.VideoEffects.Effects
         {
             LoadBackgroundImage(width, height);
 
-            _modelBatch = 1;
-
             // Allocate space for batchOfStates to hold state variable addresses
             // Assume that MODEL_BATCH Size is enough for this scenario
-            CheckResult(NvVFXAPI.NvVFX_GetU32(_handle, NvVFXParameterSelectors.NVVFX_MODEL_BATCH, out _modelBatch));
-            _batchOfStates = Marshal.AllocHGlobal((int)_modelBatch * IntPtr.Size);
+            CheckResult(NvVFXAPI.NvVFX_GetU32(_handle, NvVFXParameterSelectors.NVVFX_MODEL_BATCH, out var modelBatch));
+            _batchOfStates = Marshal.AllocHGlobal((int)modelBatch * IntPtr.Size);
             if (_batchOfStates == IntPtr.Zero)
             {
                 CheckResult(NvCVStatus.NVCV_ERR_MEMORY);
@@ -364,12 +355,12 @@ namespace NvidiaMaxine.VideoEffects.Effects
 #if OPENCV
             _dstImg = new Mat(_srcImg.Size(), MatType.CV_8UC1);
             _result = new Mat();
-            _result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);  
+            _result.Create(_srcImg.Rows, _srcImg.Cols, MatType.CV_8UC3);
 #else
             _dstImg = new VideoFrame(_srcImg.Width, _srcImg.Height, NvCVImagePixelFormat.NVCV_Y, NvCVImageComponentType.NVCV_U8);
             _result = new VideoFrame(_srcImg.Width, _srcImg.Height, NvCVImagePixelFormat.NVCV_BGR, NvCVImageComponentType.NVCV_U8);
 #endif
-            
+
             CheckNull(_result.Data, NvCVStatus.NVCV_ERR_MEMORY);
 
             _count = 0;
@@ -399,7 +390,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
 #else
             _dstImg.Clear();
 #endif
-            
+
             NVWrapperForCVMat(_srcImg, ref _srcVFX);
             NVWrapperForCVMat(_dstImg, ref _dstVFX);
 
@@ -438,11 +429,11 @@ namespace NvidiaMaxine.VideoEffects.Effects
             NvCVImage matVFX = new NvCVImage();
 
 #if OPENCV
-            _result.SetTo(Scalar.All(0));  
+            _result.SetTo(Scalar.All(0));
 #else
             _result.Clear();
 #endif
-            
+
             switch (EffectMode)
             {
                 case AIGSEffectMode.None:
@@ -460,8 +451,14 @@ namespace NvidiaMaxine.VideoEffects.Effects
                             string text = "No Background Image!";
                             for (var startY = offsetY; startY < _resizedCroppedBgImg.Height; startY += offsetY)
                             {
-                                Cv2.PutText(_resizedCroppedBgImg, text, new Point(startX, startY),
-                                    HersheyFonts.HersheyDuplex, 1.0, Scalar.FromRgb(0, 0, 0), 1);
+                                Cv2.PutText(
+                                    _resizedCroppedBgImg,
+                                    text,
+                                    new OpenCvSharp.Point(startX, startY),
+                                    HersheyFonts.HersheyDuplex,
+                                    1.0,
+                                    Scalar.FromRgb(0, 0, 0),
+                                    1);
                             }
 #endif
                         }
@@ -473,7 +470,7 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     }
 
                     break;
-                    
+
 #if OPENCV
                 case AIGSEffectMode.Light:
                     //if (inFile)
@@ -512,11 +509,13 @@ namespace NvidiaMaxine.VideoEffects.Effects
                     break;
 
                 case AIGSEffectMode.Matte:
-                    //Cv2.CvtColor(_dstImg, _result, ColorConversionCodes.GRAY2BGR);
+#if OPENCV
+                    Cv2.CvtColor(_dstImg, _result, ColorConversionCodes.GRAY2BGR);
+#else
                     var res = ImageHelper.ConvertGrayscaleToRGB(_dstImg);
                     res.CopyTo(_result);
                     res.Dispose();
-                    
+#endif
                     break;
 
                 case AIGSEffectMode.Blur:
