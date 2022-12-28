@@ -23,21 +23,10 @@
 *.idb
 *.pdb
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
 # Other
-SDK/
+3RDPARTY/
 .vs/
 obj/
 bin/
-CUDAnshita/
-managedCuda/
 Debug/
 Release/

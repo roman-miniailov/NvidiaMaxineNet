@@ -1,0 +1,60 @@
+﻿<Window x:Class="MainDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MainDemo"
+        mc:Ignorable="d"
+        Title="Nvidia Maxine Audio Effects SDK Demo" Height="450" Width="570" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="SOURCE" Margin="10,0,0,0" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="135" Width="260">
+            <Grid>
+                <RadioButton x:Name="rbSourceFile" Content="WAV file" Margin="10,10,0,0" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True"/>
+                <TextBox x:Name="edSourceFile" Margin="15,30,0,0" Height="24" Width="196" HorizontalAlignment="Left" VerticalAlignment="Top" Text="C:\Samples\!audio.wav"/>
+                <Button x:Name="btSelectSourceFile" Margin="216,30,0,0" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Top" Content=".." Click="btSelectSourceFile_Click" />
+                <RadioButton x:Name="rbSourceDevice" Content="Audio input device" Margin="10,60,0,0" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <ComboBox x:Name="cbSourceDevice" Grid.Column="0" Margin="15,80,0,0" Height="24" Width="225" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="EFFECT" Margin="10,0,0,0" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="140" Width="260">
+            <Grid>
+                <ComboBox x:Name="cbEffect" Grid.Column="0" Margin="10,10,0,0" Height="24" Width="225" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="OUTPUT" Margin="10,0,0,0" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="135" Width="260">
+            <Grid>
+                <RadioButton x:Name="rbOutputFile" Content="WAV file" Margin="10,10,0,0" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True"/>
+                <TextBox x:Name="edOutputFile" Margin="15,30,0,0" Height="24" Width="196" HorizontalAlignment="Left" VerticalAlignment="Top" Text="C:\Samples\!audio_output.wav"/>
+                <Button x:Name="btSelectOutputFile" Margin="216,30,0,0" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Top" Content=".." Click="btSelectOutputFile_Click" />
+                <RadioButton x:Name="rbOutputDevice" Content="Audio output device" Margin="10,60,0,0" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False"/>
+                <ComboBox x:Name="cbOutputDevice" Grid.Column="0" Margin="15,80,0,0" Height="24" Width="225" HorizontalAlignment="Left" VerticalAlignment="Top" IsEnabled="False" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="CONTROLS" Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="140" Width="260">
+            <Grid>
+                <TextBlock Margin="15,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">Models folder</TextBlock>
+                <TextBox x:Name="edModelsFolder" Margin="15,30,0,0" Height="24" Width="196" HorizontalAlignment="Left" VerticalAlignment="Top" Text="c:\Projects\_Projects\NvidiaMaxineNet\3RDPARTY\AFX_SDK\samples\effects_demo\models\turing\"/>
+                <Button x:Name="btSelectModelsFolder" Margin="216,30,0,0" Height="24" Width="24" HorizontalAlignment="Left" VerticalAlignment="Top" Content=".." Click="btSelectModelsFolder_Click" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,70,0,0">
+                    <Button x:Name="btStart" Height="24" Width="50" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Start" Click="btStart_Click"/>
+                    <Button x:Name="btStop" Margin="10,0,0,0" Height="24" Width="50" HorizontalAlignment="Left" VerticalAlignment="Top" Content="Stop" Click="btStop_Click"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
