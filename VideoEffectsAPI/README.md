@@ -1,6 +1,6 @@
-# Nvidia Maxine API for .Net 5 and later.
+# Nvidia Maxine API for .Net.
 
-Unofficial API for the Nvidia Maxine Video Effects SDK for .Net 5 and later.
+Unofficial API for the Nvidia Maxine Video Effects SDK for .Net Framework 4.7.2/.Net 5 and later.
 
 Console and WPF sample applications are included.
 
