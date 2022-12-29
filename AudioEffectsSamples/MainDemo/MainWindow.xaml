@@ -32,7 +32,10 @@
         </GroupBox>
         <GroupBox Header="EFFECT" Margin="10,0,0,0" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="140" Width="260">
             <Grid>
-                <ComboBox x:Name="cbEffect" Grid.Column="0" Margin="10,10,0,0" Height="24" Width="225" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                <ComboBox x:Name="cbEffect" Grid.Column="0" Margin="10,10,0,0" Height="24" Width="225" HorizontalAlignment="Left" VerticalAlignment="Top" SelectedIndex="0">
+                    <ComboBoxItem>Denoiser</ComboBoxItem>
+                    <ComboBoxItem>Dereverb</ComboBoxItem>
+                </ComboBox>
             </Grid>
         </GroupBox>
         <GroupBox Header="OUTPUT" Margin="10,0,0,0" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="135" Width="260">

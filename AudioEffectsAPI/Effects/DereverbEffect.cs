@@ -6,7 +6,7 @@
 // Last Modified By : Roman Miniailov
 // Last Modified On : 12-28-2022
 // ***********************************************************************
-// <copyright file="DenoiserEffect.cs" company="Roman Miniailov">
+// <copyright file="DereverbEffect.cs" company="Roman Miniailov">
 //     2022-2023
 // </copyright>
 // <summary></summary>
@@ -19,9 +19,9 @@ using NvidiaMaxine.AudioEffects.API;
 namespace NvidiaMaxine.AudioEffects.Effects
 {
     /// <summary>
-    /// Denoiser effect.
+    /// Dereverb effect.
     /// </summary>
-    public class DenoiserEffect : BaseEffect
+    public class DereverbEffect : BaseEffect
     {
         /// <summary>
         /// The intensity ratio.
@@ -29,19 +29,19 @@ namespace NvidiaMaxine.AudioEffects.Effects
         private float _intensityRatio = 1.0f;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DenoiserEffect"/> class.
+        /// Initializes a new instance of the <see cref="DereverbEffect"/> class.
         /// </summary>
         /// <param name="modelDir">The model directory.</param>
         /// <param name="sampleRate">The sample rate.</param>
-        public DenoiserEffect(string modelDir, SampleRate sampleRate)
+        public DereverbEffect(string modelDir, SampleRate sampleRate)
             : base(modelDir, sampleRate)
         {
             if (sampleRate == SampleRate.SR8000)
             {
-                throw new ArgumentException("Denoiser effect supports 16000 Hz and 48000 Hz.");
+                throw new ArgumentException("Dereverb effect supports 16000 Hz and 48000 Hz.");
             }
 
-            TAG = "Denoiser";
+            TAG = "Dereverb";
         }
 
         /// <summary>
@@ -96,11 +96,11 @@ namespace NvidiaMaxine.AudioEffects.Effects
         {
             if (_sampleRate == SampleRate.SR48000)
             {
-                return "denoiser_48k.trtpkg";
+                return "dereverb_48k.trtpkg";
             }
             else
             {
-                return "denoiser_16k.trtpkg";
+                return "dereverb_16k.trtpkg";
             }
         }
 
@@ -110,7 +110,7 @@ namespace NvidiaMaxine.AudioEffects.Effects
         /// <returns>System.String.</returns>
         protected override string GetEffectName()
         {
-            return NvAFXEffectSelectors.NVAFX_EFFECT_DENOISER;
+            return NvAFXEffectSelectors.NVAFX_EFFECT_DEREVERB;
         }
 
         /// <summary>

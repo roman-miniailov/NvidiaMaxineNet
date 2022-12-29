@@ -13,7 +13,7 @@ namespace MainDemo
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DenoiserEffect _effect;
+        private BaseEffect _effect;
 
         private IAudioSource _source;
 
@@ -62,7 +62,18 @@ namespace MainDemo
         private void btStart_Click(object sender, RoutedEventArgs e)
         {
             // create effect
-            _effect = new DenoiserEffect(edModelsFolder.Text, SampleRate.SR48000);
+            switch (cbEffect.SelectedIndex)
+            {
+                case 0:
+                    _effect = new DenoiserEffect(edModelsFolder.Text, SampleRate.SR48000);
+                    break;
+                case 1:
+                    _effect = new DereverbEffect(edModelsFolder.Text, SampleRate.SR48000);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Wrong effect index");
+            }            
+            
             if (!_effect.Init())
             {
                 MessageBox.Show("Failed to initialize effect");

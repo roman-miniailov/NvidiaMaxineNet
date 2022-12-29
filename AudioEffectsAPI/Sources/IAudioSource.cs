@@ -1,9 +1,9 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.AudioEffects
-// Author           : Roman
+// Author           : Roman Miniailov
 // Created          : 12-28-2022
 //
-// Last Modified By : Roman
+// Last Modified By : Roman Miniailov
 // Last Modified On : 12-28-2022
 // ***********************************************************************
 // <copyright file="IAudioSource.cs" company="Roman Miniailov">

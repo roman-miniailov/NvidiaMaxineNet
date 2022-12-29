@@ -1,6 +1,6 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.AudioEffects
-// Author           : Roman Miniailov, NightVsKnight
+// Author           : Roman Miniailov
 // Created          : 12-27-2022
 //
 // Last Modified By : Roman Miniailov
