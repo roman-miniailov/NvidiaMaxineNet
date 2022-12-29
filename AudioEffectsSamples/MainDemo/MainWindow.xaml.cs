@@ -70,6 +70,9 @@ namespace MainDemo
                 case 1:
                     _effect = new DereverbEffect(edModelsFolder.Text, SampleRate.SR48000);
                     break;
+                case 2:
+                    _effect = new DereverbDenoiserEffect(edModelsFolder.Text, SampleRate.SR48000);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("Wrong effect index");
             }            
