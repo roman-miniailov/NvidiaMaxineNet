@@ -18,7 +18,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NvidiaMaxine.AudioEffects
+namespace NvidiaMaxine.AudioEffects.Sources
 {
     /// <summary>
     /// WAV file reader.
@@ -72,7 +72,7 @@ namespace NvidiaMaxine.AudioEffects
         /// <param name="sampleRate">The sample rate.</param>
         /// <param name="channels">The channels.</param>
         /// <param name="bps">The BPS.</param>
-        /// <exception cref="System.IO.FileNotFoundException">File not found</exception>
+        /// <exception cref="FileNotFoundException">File not found</exception>
         public WAVFileSource(string filename, int sampleRate, int channels, int bps)
         {
             if (!File.Exists(filename))

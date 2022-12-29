@@ -6,7 +6,7 @@
 // Last Modified By : Roman Miniailov
 // Last Modified On : 12-28-2022
 // ***********************************************************************
-// <copyright file="DenoiserEffect.cs" company="Roman Miniailov">
+// <copyright file="BaseEffect.cs" company="Roman Miniailov">
 //     2022-2023
 // </copyright>
 // <summary></summary>
@@ -17,17 +17,17 @@ using System.Diagnostics;
 using System.IO;
 using NvidiaMaxine.AudioEffects.API;
 
-namespace NvidiaMaxine.AudioEffects
+namespace NvidiaMaxine.AudioEffects.Effects
 {
     /// <summary>
-    /// Denoiser effect.
+    /// Base effect.
     /// </summary>
-    public class DenoiserEffect : IDisposable
+    public class BaseEffect : IDisposable
     {
         /// <summary>
         /// The tag.
         /// </summary>
-        private const string TAG = "NvAfxDenoiser";
+        protected string TAG = "";
 
         /// <summary>
         /// The model dir.
@@ -35,24 +35,19 @@ namespace NvidiaMaxine.AudioEffects
         private readonly string _modelDir;
 
         /// <summary>
-        /// The intensity ratio.
+        /// The sample rate.
         /// </summary>
-        private float _intensityRatio = 1.0f;
+        protected readonly SampleRate _sampleRate;
+
+        /// <summary>
+        /// The frame size.
+        /// </summary>
+        protected readonly int _frameSize;               
 
         /// <summary>
         /// The disposed value.
         /// </summary>
         private bool disposedValue;
-
-        /// <summary>
-        /// The nvafx sample rate.
-        /// </summary>
-        public static uint NVAFX_SAMPLE_RATE = 48000;
-
-        /// <summary>
-        /// The nvafx frame size.
-        /// </summary>
-        public static uint NVAFX_FRAME_SIZE = 480; // the sdk does not explicitly set this as a constant though it relies on it
 
         /// <summary>
         /// The nvafx number channels.
@@ -62,7 +57,7 @@ namespace NvidiaMaxine.AudioEffects
         /// <summary>
         /// The handle.
         /// </summary>
-        private IntPtr _handle;
+        protected IntPtr _handle;
 
         /// <summary>
         /// Gets a value indicating whether this instance is enabled.
@@ -77,68 +72,65 @@ namespace NvidiaMaxine.AudioEffects
         public int NumChannels { get { return (int)NVAFX_NUM_CHANNELS; } }
 
         /// <summary>
-        /// Gets the number samples per frame.
-        /// </summary>
-        /// <value>The number samples per frame.</value>
-        public int NumSamplesPerFrame { get { return (int)NVAFX_FRAME_SIZE; } }
-
-        /// <summary>
         /// Gets the sample rate.
         /// </summary>
         /// <value>The sample rate.</value>
-        public int SampleRate { get { return (int)NVAFX_SAMPLE_RATE; } }
-
-        /// <summary>
-        /// Gets the intensity ratio.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
-        public bool GetIntensityRatio(out float value)
+        public SampleRate SampleRate
         {
-            value = 0;
-
-            if (IsEnabled)
+            get
             {
-                NvAFXStatus result = NvAFXAPI.NvAFX_GetFloat(_handle, NvAFXParameterSelectors.NVAFX_PARAM_INTENSITY_RATIO, out _intensityRatio);
-                if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
-                {
-                    Debug.WriteLine($"{TAG} Error CreateEffect: NvAFX_GetFloat(Intensity Ratio) failed, error {result}");
-                    return false;
-                }
+                return _sampleRate;
             }
-
-            value = _intensityRatio;
-            return true;
         }
 
         /// <summary>
-        /// Sets the intensity ratio.
+        /// Gets the frame size.
         /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
-        public bool SetIntensityRatio(float value)
+        public int FrameSize
         {
-            _intensityRatio = value;
-            if (IsEnabled)
+            get
             {
-                NvAFXStatus result = NvAFXAPI.NvAFX_SetFloat(_handle, NvAFXParameterSelectors.NVAFX_PARAM_INTENSITY_RATIO, _intensityRatio);
-                if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
-                {
-                    Debug.WriteLine($"{TAG} Error CreateEffect: NvAFX_SetFloat(Intensity Ratio: {_intensityRatio}) failed, error {result}");
-                    return false;
-                }
+                return _frameSize;
             }
-
-            return true;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DenoiserEffect"/> class.
+        /// Initializes a new instance of the <see cref="BaseEffect"/> class.
         /// </summary>
-        /// <param name="modelDir">The model dir.</param>
-        public DenoiserEffect(string modelDir)
+        /// <param name="modelDir">The model directory.</param>
+        /// <param name="sampleRate">The sample rate.</param>
+        public BaseEffect(string modelDir, SampleRate sampleRate)
         {
             _modelDir = modelDir;
+            _sampleRate = sampleRate;
+            _frameSize = _sampleRate.GetFrameSize();
+        }
+
+        /// <summary>
+        /// Gets the name of the model.
+        /// </summary>
+        /// <returns>System.String.</returns>
+        protected virtual string GetModelName()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the name of the effect.
+        /// </summary>
+        /// <returns>System.String.</returns>
+        protected virtual string GetEffectName()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Applies the settings.
+        /// </summary>
+        /// <returns>NvAFXStatus.</returns>
+        protected virtual NvAFXStatus ApplySettings()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -158,7 +150,7 @@ namespace NvidiaMaxine.AudioEffects
 
             try
             {
-                result = NvAFXAPI.NvAFX_CreateEffect(NvAFXEffectSelectors.NVAFX_EFFECT_DENOISER, out _handle);
+                result = NvAFXAPI.NvAFX_CreateEffect(GetEffectName(), out _handle);
                 if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
                 {
                     Debug.WriteLine($"{TAG} Error CreateEffect: NvAFX_CreateEffect failed, error {result}");
@@ -166,7 +158,8 @@ namespace NvidiaMaxine.AudioEffects
                 }
 
                 // Set AI models path
-                string modelPath = Path.Combine(_modelDir, "denoiser_48k.trtpkg");
+                string modelPath = Path.Combine(_modelDir, GetModelName());
+
                 result = NvAFXAPI.NvAFX_SetString(_handle, NvAFXParameterSelectors.NVAFX_PARAM_MODEL_PATH, modelPath);
                 if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
                 {
@@ -182,13 +175,11 @@ namespace NvidiaMaxine.AudioEffects
                     Debug.WriteLine($"{TAG} Error CreateEffect: NvAFX_SetU32(Sample Rate: {sampleRate}) failed, error {result}");
                     goto FAILURE;
                 }
-
-                // Set intensity of FX
-                float intensity_ratio = _intensityRatio;
-                result = NvAFXAPI.NvAFX_SetFloat(_handle, NvAFXParameterSelectors.NVAFX_PARAM_INTENSITY_RATIO, intensity_ratio);
+                
+                // Apply settings
+                result = ApplySettings();
                 if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
-                {
-                    Debug.WriteLine($"{TAG} Error CreateEffect: NvAFX_SetFloat(Intensity Ratio: {intensity_ratio}) failed, error {result}");
+                {                    
                     goto FAILURE;
                 }
 
@@ -209,10 +200,10 @@ namespace NvidiaMaxine.AudioEffects
                     goto FAILURE;
                 }
 
-                if (sampleRate != NVAFX_SAMPLE_RATE)
+                if (sampleRate != (int)_sampleRate)
                 {
                     result = NvAFXStatus.NVAFX_STATUS_FAILED;
-                    Debug.WriteLine($"{TAG} Error CreateEffect: The input sample rate {sampleRate} is not the expected {NVAFX_SAMPLE_RATE}.");
+                    Debug.WriteLine($"{TAG} Error CreateEffect: The input sample rate {sampleRate} is not the expected {(int)_sampleRate}.");
                     goto FAILURE;
                 }
 
@@ -223,10 +214,10 @@ namespace NvidiaMaxine.AudioEffects
                     goto FAILURE;
                 }
 
-                if (sampleRate != NVAFX_SAMPLE_RATE)
+                if (sampleRate != (int)_sampleRate)
                 {
                     result = NvAFXStatus.NVAFX_STATUS_FAILED;
-                    Debug.WriteLine($"{TAG} Error CreateEffect: The output sample rate {sampleRate} is not the expected {NVAFX_SAMPLE_RATE}.");
+                    Debug.WriteLine($"{TAG} Error CreateEffect: The output sample rate {sampleRate} is not the expected {(int)_sampleRate}.");
                     goto FAILURE;
                 }
 
@@ -268,10 +259,10 @@ namespace NvidiaMaxine.AudioEffects
                     goto FAILURE;
                 }
 
-                if (numSamplesPerFrame != NVAFX_FRAME_SIZE)
+                if (numSamplesPerFrame != _frameSize)
                 {
                     result = NvAFXStatus.NVAFX_STATUS_FAILED;
-                    Debug.WriteLine($"{TAG} Error CreateEffect: The input samples per frame {numSamplesPerFrame} is not the expected {NVAFX_FRAME_SIZE} (= 10 ms).");
+                    Debug.WriteLine($"{TAG} Error CreateEffect: The input samples per frame {numSamplesPerFrame} is not the expected {_frameSize} (= 10 ms).");
                     goto FAILURE;
                 }
 
@@ -282,10 +273,10 @@ namespace NvidiaMaxine.AudioEffects
                     goto FAILURE;
                 }
 
-                if (numSamplesPerFrame != NVAFX_FRAME_SIZE)
+                if (numSamplesPerFrame != _frameSize)
                 {
                     result = NvAFXStatus.NVAFX_STATUS_FAILED;
-                    Debug.WriteLine($"{TAG} Error CreateEffect: The output samples per frame {numSamplesPerFrame} is not the expected {NVAFX_FRAME_SIZE} (= 10 ms).");
+                    Debug.WriteLine($"{TAG} Error CreateEffect: The output samples per frame {numSamplesPerFrame} is not the expected {_frameSize} (= 10 ms).");
                     goto FAILURE;
                 }
 
@@ -355,8 +346,8 @@ namespace NvidiaMaxine.AudioEffects
                 int end = offset + count;
                 while (offset < end)
                 {
-                    bufferWrapper = BufferWrapper.Get(buffer, offset, NumSamplesPerFrame);
-                    result = NvAFXAPI.NvAFX_Run(_handle, bufferWrapper, bufferWrapper, (uint)NumSamplesPerFrame, (uint)NumChannels);
+                    bufferWrapper = BufferWrapper.Get(buffer, offset, _frameSize);
+                    result = NvAFXAPI.NvAFX_Run(_handle, bufferWrapper, bufferWrapper, (uint)_frameSize, (uint)NumChannels);
                     if (result != NvAFXStatus.NVAFX_STATUS_SUCCESS)
                     {
                         Debug.WriteLine($"{TAG} Error Run: NvAFX_Run failed, error {result}");
@@ -365,7 +356,7 @@ namespace NvidiaMaxine.AudioEffects
 
                     bufferWrapper.CopyNativeBufferToManagedBuffer();
                     BufferWrapper.Return(bufferWrapper);
-                    offset += NumSamplesPerFrame;
+                    offset += _frameSize;
                 }
 
                 return true;
@@ -396,9 +387,9 @@ namespace NvidiaMaxine.AudioEffects
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="DenoiserEffect"/> class.
+        /// Finalizes an instance of the <see cref="BaseEffect"/> class.
         /// </summary>
-        ~DenoiserEffect()
+        ~BaseEffect()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: false);

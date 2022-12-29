@@ -11,3 +11,7 @@ Currently Windows only.
 [CUDA Runtime 12](https://developer.nvidia.com/cuda-downloads) and [Audio Effects SDK](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/maxine/collections/maxine) are required.
 
 Be sure that Audio Effects SDK bin folder included in PATH environment variable.
+
+## Used 3rd-party packages
+
+- [NAudio](https://github.com/naudio/NAudio)

@@ -1,9 +1,9 @@
 ﻿// ***********************************************************************
 // Assembly         : NvidiaMaxine.AudioEffects
-// Author           : Roman
+// Author           : Roman Miniailov
 // Created          : 12-27-2022
 //
-// Last Modified By : Roman
+// Last Modified By : Roman Miniailov
 // Last Modified On : 12-28-2022
 // ***********************************************************************
 // <copyright file="WAVFileWriter.cs" company="Roman Miniailov">
@@ -15,10 +15,10 @@
 using NAudio.Wave;
 using System;
 
-namespace NvidiaMaxine.AudioEffects
+namespace NvidiaMaxine.AudioEffects.Outputs
 {
     /// <summary>
-    /// Audio File Writer.
+    /// WAV file writer.
     /// Implements the <see cref="IDisposable" />.
     /// </summary>
     /// <seealso cref="IDisposable" />
@@ -42,15 +42,15 @@ namespace NvidiaMaxine.AudioEffects
         /// <param name="numChannels">The number channels.</param>
         /// <param name="bitsPerSample">The bits per sample.</param>
         /// <param name="isFloat">if set to <c>true</c> [is float].</param>
-        public WAVFileWriter(string wavFile, uint samplesPerSec, uint numChannels, uint bitsPerSample, bool isFloat)
+        public WAVFileWriter(string wavFile, int samplesPerSec, int numChannels, int bitsPerSample, bool isFloat)
         {
             if (isFloat)
             {
-                _writer = new WaveFileWriter(wavFile, WaveFormat.CreateIeeeFloatWaveFormat((int)samplesPerSec, (int)numChannels));
+                _writer = new WaveFileWriter(wavFile, WaveFormat.CreateIeeeFloatWaveFormat(samplesPerSec, numChannels));
             }
             else
             {
-                _writer = new WaveFileWriter(wavFile, new WaveFormat((int)samplesPerSec, (int)bitsPerSample, (int)numChannels));
+                _writer = new WaveFileWriter(wavFile, new WaveFormat(samplesPerSec, bitsPerSample, numChannels));
             }
         }
 

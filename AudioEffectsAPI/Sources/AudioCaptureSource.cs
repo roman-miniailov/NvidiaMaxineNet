@@ -17,14 +17,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NvidiaMaxine.AudioEffects
+namespace NvidiaMaxine.AudioEffects.Sources
 {
     /// <summary>
     /// Audio capture source.
-    /// Implements the <see cref="NvidiaMaxine.AudioEffects.IAudioSource" />
+    /// Implements the <see cref="IAudioSource" />
     /// Implements the <see cref="IDisposable" />.
     /// </summary>
-    /// <seealso cref="NvidiaMaxine.AudioEffects.IAudioSource" />
+    /// <seealso cref="IAudioSource" />
     /// <seealso cref="IDisposable" />
     public class AudioCaptureSource : IAudioSource, IDisposable
     {
@@ -70,7 +70,7 @@ namespace NvidiaMaxine.AudioEffects
         /// <param name="channels">The channels.</param>
         /// <param name="bps">The BPS.</param>
         /// <param name="isFloat">if set to <c>true</c> [is float].</param>
-        /// <exception cref="System.ArgumentException">Invalid device name</exception>
+        /// <exception cref="ArgumentException">Invalid device name</exception>
         public AudioCaptureSource(string name, int sampleRate, int channels, int bps, bool isFloat)
         {
             var sources = Enumerate();
@@ -110,8 +110,8 @@ namespace NvidiaMaxine.AudioEffects
         /// Handles the DataAvailable event of the _source control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="NAudio.Wave.WaveInEventArgs"/> instance containing the event data.</param>
-        private void _source_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
+        /// <param name="e">The <see cref="WaveInEventArgs"/> instance containing the event data.</param>
+        private void _source_DataAvailable(object sender, WaveInEventArgs e)
         {
             float[] data = new float[e.BytesRecorded / 4];
             Buffer.BlockCopy(e.Buffer, 0, data, 0, e.BytesRecorded);

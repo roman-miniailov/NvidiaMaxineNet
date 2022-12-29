@@ -14,7 +14,7 @@
 
 using System;
 
-namespace NvidiaMaxine.AudioEffects
+namespace NvidiaMaxine.AudioEffects.Sources
 {
     /// <summary>
     /// Interface IAudioSource.

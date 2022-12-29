@@ -1,5 +1,7 @@
 ﻿using NvidiaMaxine.AudioEffects;
-
+using NvidiaMaxine.AudioEffects.Effects;
+using NvidiaMaxine.AudioEffects.Outputs;
+using NvidiaMaxine.AudioEffects.Sources;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -60,7 +62,7 @@ namespace MainDemo
         private void btStart_Click(object sender, RoutedEventArgs e)
         {
             // create effect
-            _effect = new DenoiserEffect(edModelsFolder.Text);
+            _effect = new DenoiserEffect(edModelsFolder.Text, SampleRate.SR48000);
             if (!_effect.Init())
             {
                 MessageBox.Show("Failed to initialize effect");
@@ -70,13 +72,13 @@ namespace MainDemo
             // create source
             if (rbSourceFile.IsChecked == true)
             {
-                _source = new WAVFileSource(edSourceFile.Text, 48000, 1, 16);
+                _source = new WAVFileSource(edSourceFile.Text, (int)_effect.SampleRate, 1, 16);
                 _source.DataAvailable += _source_DataAvailable;
                 _source.Complete += _source_Complete;                
             }
             else
             {
-                _source = new AudioCaptureSource(cbSourceDevice.Text, 48000, 1, 16, true);
+                _source = new AudioCaptureSource(cbSourceDevice.Text, (int)_effect.SampleRate, 1, 16, true);
                 _source.DataAvailable += _source_DataAvailable;
                 _source.Complete += _source_Complete;
             }
@@ -84,10 +86,10 @@ namespace MainDemo
             // create output
             if (rbOutputFile.IsChecked == true)
             {
-                _fileWriter = new WAVFileWriter(edOutputFile.Text, 48000, 1, 32, true);
+                _fileWriter = new WAVFileWriter(edOutputFile.Text, (int)_effect.SampleRate, 1, 32, true);
             }
 
-            _source.Start((int)DenoiserEffect.NVAFX_FRAME_SIZE);
+            _source.Start((int)_effect.FrameSize);
         }
 
         private void _source_Complete(object sender, EventArgs e)
